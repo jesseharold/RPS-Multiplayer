@@ -13,5 +13,5 @@ TODO:
  - change local storage to cookie / add network access
  - hide the other player's move and score
  - add chat
- - add style or...
+ - add style, hand images, rotate hands, let player choose color (css transforms)
  - (optional) integrate network with your SET game!
