@@ -24,53 +24,56 @@ function initGame(){
 	$("#result").on("click", "#set-name", 	newGame);
 	$("button.set-name").click(function(){
 		var input = $(this).prev("input").val();
-		var plyNum = $(this).parents("section").find("div.buttons").data("player");
-		players[plyNum-1].name = input;
+		var playerNumber = $(this)
+			.parents("section")
+			.find("div.buttons")
+			.data("player");
+		players[playerNumber-1].name = input;
 		displayPlayers();
 	});
 	//empty input when you click on it
 	$("input.player-name").on("focus", function(){
 		$(this).val("");
 	})
-	gameFromStorage();
+	getGameFromStorage();
 	newGame();
 }
-function makeMove(move, player){
-	if (!players[player].currentMove){
-		players[player].currentMove = move;
+function makeMove(move, playerID){
+	if (!players[playerID].currentMove){
+		// prevent someone from making multiple moves in a game
+		players[playerID].currentMove = move;
 
-		var otherPlayer = (player+1) % 2;
+		var otherPlayer = (playerID+1) % 2;
 		if (players[otherPlayer].currentMove){
 			var winner = testMoves();
 			displayWinner(winner);
 		}
 		//hide buttons until next move
-		$("section#player"+(player+1)).find("div.buttons").hide();
+		$("section#player"+(playerID+1)).find("div.buttons").hide();
 
 		// use default value if no name entered
-		if (players[player].name === "") {
-			players[player].name = "Player " + (player+1);
+		if (players[playerID].name === "") {
+			players[playerID].name = "Player " + (playerID+1);
 		}
-	} else {
-		// prevent someone from making multiple moves in a game
 	}
 	displayPlayers();
 }
 function displayPlayers(){
 	for (var i = 0; i < players.length; i++) {
-		var el = $("#player" + (i+1));
+		var section = $("#player" + (i+1));
 		if (players[i].name){
-			el.find(".name").text(players[i].name);
+			section.find(".name").text(players[i].name);
 		}
-		el.find(".score").text("Wins: " + players[i].wins + ", Losses: " + players[i].losses);
+		var scoreText = "Wins: " + players[i].wins + ", Losses: " + players[i].losses;
+		section.find(".score").text(scoreText);
 		if (players[i].currentMove){
-			el.find(".move").text("Played: " + players[i].currentMove);
+			section.find(".move").text("Played: " + players[i].currentMove);
 		} else {
-			el.find(".move").text("Played: ");
+			section.find(".move").text("Played: ");
 		}
 	}
 	// store the game each time it changes:
-	gameToStorage();
+	saveGameToStorage();
 }
 function testMoves(){
 	if (players[0].currentMove === "rock"){
@@ -99,17 +102,20 @@ function testMoves(){
 		}
 	}
 }
-function displayWinner(plyr){
-	if (plyr === "tie"){
+function displayWinner(winnerID){
+	if (winnerID === "tie"){
 		$("#result #display").text("Tie!");
 	} else {
-		$("#result #display").text(players[plyr].name + " wins!");
-		players[plyr].wins++;
-		var otherPlayer = (plyr+1) % 2;
+		$("#result #display").text(players[winnerID].name + " wins!");
+		players[winnerID].wins++;
+		var otherPlayer = (winnerID+1) % 2;
 		players[otherPlayer].losses++;
 	}
 	displayPlayers();
-	var newGameButton = $("<button>").text("Play Again").attr("id", "set-name");
+	var newGameButton = $("<button>");
+	newGameButton
+		.text("Play Again")
+		.attr("id", "set-name");
 	$("#result #display").append(newGameButton);
 }
 function newGame(){
@@ -122,11 +128,11 @@ function newGame(){
 	displayPlayers();
 
 }
-function gameToStorage(){
+function saveGameToStorage(){
 	localStorage.setItem("game", JSON.stringify(players));
 }
 
-function gameFromStorage(){
+function getGameFromStorage(){
 	if (localStorage.getItem("game")){
 		players = JSON.parse(localStorage.getItem("game"));
 	}
