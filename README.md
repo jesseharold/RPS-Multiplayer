@@ -12,6 +12,8 @@ TODO:
  - get full homework requirements
  - add data persistence
  - add network access
+ - hide the other player's move and score
  - add chat
+ - players should be able to set their names
  - add style or...
  - (optional) integrate network with your SET game!
