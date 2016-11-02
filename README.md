@@ -1,4 +1,7 @@
 # RockPaperScissors-Network
+
+https://jesseharold.github.io/RockPaperScissors-Network/
+
 A game of Rock, Paper, Scissors that you can play over the network with another player
 
 For homework, week 7, UCLA coding boot camp
