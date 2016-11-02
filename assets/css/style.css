@@ -1,0 +1,33 @@
+body {
+    
+}
+h1 {
+ 
+}
+h2 {
+    margin-top: -4px;
+}
+section {
+}
+#player1, #result, #player2 {
+    float: left;
+    background-color: #ddd;
+    border: 1px black solid;
+    margin: 30px;
+    padding: 10px;
+}
+
+button {    
+    margin-bottom: 15px;
+}
+#newGameButton {    
+    display: block;
+    font-size: large;
+    margin: 8px 0;
+}
+footer {
+}
+/* responsive styles! */
+@media screen and (max-width: 750px) {
+   
+}

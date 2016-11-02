@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Rock Paper Scissors - Multiplayer</title>
+	<link rel="stylesheet" type="text/css" href="assets/css/style.css">
+	<script type="text/javascript" src="assets/javascript/jquery-3.1.1.min.js"></script>
+</head>
+<body>
+<h1>Rock Paper Scissors</h1>
+	<section id="header"></section>
+	<section id="player1">
+		<h2 class="name">Player 1</h2>
+		<div class="buttons" data-player="1">
+			<button class="play" data-move="rock">ROCK</button>
+			<button class="play" data-move="paper">PAPER</button>
+			<button class="play" data-move="scissors">SCISSORS</button>
+		</div>
+		<div class="move"></div>
+		<div class="score">Wins: 0, Losses: 0</div>
+	</section>
+	<section id="result">
+		<h2 class="name">Result</h2>
+		<div id="display"></div>
+	</section>
+	<section id="player2">
+		<h2 class="name">Player 2</h2>
+		<div class="buttons" data-player="2">
+			<button class="play" data-move="rock">ROCK</button>
+			<button class="play" data-move="paper">PAPER</button>
+			<button class="play" data-move="scissors">SCISSORS</button>
+		</div>
+		<div class="move"></div>
+		<div class="score">Wins: 0, Losses: 0</div>
+	</section>
+	<section id="chat"></section>
+	<script type="text/javascript" src="assets/javascript/app.js"></script>
+</body>
+</html>
