@@ -21,15 +21,15 @@ function initGame(){
 	$("button.play").click(function(){
 		makeMove($(this).data("move"), $(this).parent().data("player")-1);
 	});
-	$("#result").on("click", "#newGameButton", 	newGame);
-	$("button.setName").click(function(){
+	$("#result").on("click", "#set-name", 	newGame);
+	$("button.set-name").click(function(){
 		var input = $(this).prev("input").val();
 		var plyNum = $(this).parents("section").find("div.buttons").data("player");
 		players[plyNum-1].name = input;
 		displayPlayers();
 	});
 	//empty input when you click on it
-	$("input.playerName").on("focus", function(){
+	$("input.player-name").on("focus", function(){
 		$(this).val("");
 	})
 	gameFromStorage();
@@ -109,7 +109,7 @@ function displayWinner(plyr){
 		players[otherPlayer].losses++;
 	}
 	displayPlayers();
-	var newGameButton = $("<button>").text("Play Again").attr("id", "newGameButton");
+	var newGameButton = $("<button>").text("Play Again").attr("id", "set-name");
 	$("#result #display").append(newGameButton);
 }
 function newGame(){
