@@ -11,5 +11,6 @@ For homework, week 7, UCLA coding boot camp
  * change local storage to cookie / add network access
  * hide the other player's move and score
  * add chat
- * add style, hand images, rotate hands, let player choose color (css transforms)
+ * add color and fonts
+ * let player choose hand color? look at this: https://codepen.io/designerJordan/pen/qDEjr
  * (optional) integrate network with your SET game!
