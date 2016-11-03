@@ -21,7 +21,7 @@ function initGame(){
 	$("button.play").click(function(){
 		makeMove($(this).data("move"), $(this).parent().data("player")-1);
 	});
-	$("#result").on("click", "#set-name", 	newGame);
+	$("#result").on("click", "#new-game-button", 	newGame);
 	$("button.set-name").click(function(){
 		var input = $(this).prev("input").val();
 		var playerNumber = $(this)
@@ -73,7 +73,7 @@ function displayPlayers(){
 				.addClass("hand-image");
 			section.find(".move").html(handImage);
 		} else {
-			section.find(".move").text("Played: ");
+			section.find(".move").html("");
 		}
 	}
 	// store the game each time it changes:

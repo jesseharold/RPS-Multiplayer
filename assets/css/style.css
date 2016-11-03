@@ -26,14 +26,23 @@ h2 {
     color: #fff;
     text-align: center;
 }
+.buttons {
+    text-align: center;
+}
 button {    
     margin-bottom: 15px;
+}
+button.play {
+    font-size: large;
 }
 #new-game-button {    
     display: block;
     font-size: large;
     margin: 10% 0;
     width: 100%;
+}
+#player2 .name, #player2 .score {
+    text-align: right;
 }
 /* got this from csstricks.com */
 #player2 img.hand-image {
