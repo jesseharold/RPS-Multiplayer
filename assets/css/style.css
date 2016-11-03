@@ -7,26 +7,44 @@ h1 {
 h2 {
     margin-top: -4px;
 }
-section {
-}
-#player1, #result, #player2 {
+#player1, #player2 {
     float: left;
     background-color: #ddd;
     border: 1px black solid;
-    margin: 30px;
-    padding: 10px;
+    margin: 2%;
+    padding: 1%;
+    width: 40%;
 }
-
+#result {
+    position: absolute;
+    top: 0;
+    right: 46%;
+    width: 9%;
+    background-color: cadetblue;
+    padding: 1%;
+    margin: 1%;
+    color: #fff;
+    text-align: center;
+}
 button {    
     margin-bottom: 15px;
 }
 #new-game-button {    
     display: block;
     font-size: large;
-    margin: 8px 0;
+    margin: 10% 0;
+    width: 100%;
 }
-footer {
+/* got this from csstricks.com */
+#player2 img.hand-image {
+    -moz-transform: scaleX(-1);
+    -o-transform: scaleX(-1);
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+    filter: FlipH;
+    -ms-filter: "FlipH";
 }
+
 /* responsive styles! */
 @media screen and (max-width: 750px) {
    

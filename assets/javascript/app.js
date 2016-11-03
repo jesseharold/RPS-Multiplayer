@@ -51,7 +51,7 @@ function makeMove(move, playerID){
 		//hide buttons until next move
 		$("section#player"+(playerID+1)).find("div.buttons").hide();
 
-		// use default value if no name entered
+		// use default value if no player name entered
 		if (players[playerID].name === "") {
 			players[playerID].name = "Player " + (playerID+1);
 		}
@@ -67,7 +67,11 @@ function displayPlayers(){
 		var scoreText = "Wins: " + players[i].wins + ", Losses: " + players[i].losses;
 		section.find(".score").text(scoreText);
 		if (players[i].currentMove){
-			section.find(".move").text("Played: " + players[i].currentMove);
+			var handImage = $("<img>");
+			handImage
+				.attr("src", "assets/images/" + players[i].currentMove + ".png")
+				.addClass("hand-image");
+			section.find(".move").html(handImage);
 		} else {
 			section.find(".move").text("Played: ");
 		}
@@ -115,7 +119,7 @@ function displayWinner(winnerID){
 	var newGameButton = $("<button>");
 	newGameButton
 		.text("Play Again")
-		.attr("id", "set-name");
+		.attr("id", "new-game-button");
 	$("#result #display").append(newGameButton);
 }
 function newGame(){
