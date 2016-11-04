@@ -17,7 +17,6 @@ var database;
 var chatHistory = [];
 // settings
 
-
 function initGame(){
 	// Initialize Firebase
 	var config = {
@@ -27,14 +26,15 @@ function initGame(){
 		storageBucket: "testing-3cc34.appspot.com",
 		messagingSenderId: "222650091540"
 	};
-	firebase.initializeApp(config);
+  	firebase.initializeApp(config);
+
 	// get a reference to the database
 	database = firebase.database();
 	
 	// update local data when database changes
-	database.ref().on("value", function(snapshot){
-		console.log(snapshot[0]);
-		//players = snapshot;
+	database.ref("players").on("value", function(snapshot){
+		//console.log(snapshot.val()[0]);
+		players = snapshot.val();
 	}, function(error){
 		console.error(error);
 	});
@@ -155,7 +155,7 @@ function newGame(){
 
 }
 function saveGameToStorage(){
-	database.ref().set(players);
+	database.ref("players").set(players);
 }
 
 
