@@ -28,6 +28,7 @@ function initGame(){
 		messagingSenderId: "222650091540"
 	};
 	firebase.initializeApp(config);
+	// get a reference to the database
 	database = firebase.database();
 
 	$("button.play").click(function(){
@@ -47,7 +48,7 @@ function initGame(){
 	$("input.player-name").on("focus", function(){
 		$(this).val("");
 	})
-	getGameFromStorage();
+	//getGameFromStorage();
 	newGame();
 }
 function makeMove(move, playerID){
@@ -92,6 +93,8 @@ function displayPlayers(){
 	saveGameToStorage();
 }
 function testMoves(){
+	var moveValues = ["paper", "scissors", "rock"];
+
 	if (players[0].currentMove === "rock"){
 		if (players[1].currentMove === "rock"){
 			return "tie";
@@ -133,9 +136,6 @@ function displayWinner(winnerID){
 		.text("Play Again")
 		.attr("id", "new-game-button");
 	$("#result #display").append(newGameButton);
-	database.ref().set({
-			playerWon: players[winnerID].name
-	});
 }
 function newGame(){
 	for (var i = 0; i < players.length; i++) {
@@ -148,12 +148,14 @@ function newGame(){
 
 }
 function saveGameToStorage(){
-	localStorage.setItem("game", JSON.stringify(players));
+	database.ref().set(players);
 }
 
-function getGameFromStorage(){
-	if (localStorage.getItem("game")){
-		players = JSON.parse(localStorage.getItem("game"));
-	}
-}
+//function getGameFromStorage(){}
+
+database.ref().on("value", function(snapshot){
+	players = snapshot;
+}, function(error){
+	console.error(error);
+});
 $(document).ready(initGame);
