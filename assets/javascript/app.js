@@ -13,11 +13,23 @@ var players = [
 		currentMove : false
 	}
 ];
+var database;
 var chatHistory = [];
 // settings
 
 
 function initGame(){
+	// Initialize Firebase
+	var config = {
+		apiKey: "AIzaSyDpkXfloYmdVW9IyEoyfTrAE07OmBKNf8U",
+		authDomain: "testing-3cc34.firebaseapp.com",
+		databaseURL: "https://testing-3cc34.firebaseio.com",
+		storageBucket: "testing-3cc34.appspot.com",
+		messagingSenderId: "222650091540"
+	};
+	firebase.initializeApp(config);
+	database = firebase.database();
+
 	$("button.play").click(function(){
 		makeMove($(this).data("move"), $(this).parent().data("player")-1);
 	});
@@ -121,6 +133,9 @@ function displayWinner(winnerID){
 		.text("Play Again")
 		.attr("id", "new-game-button");
 	$("#result #display").append(newGameButton);
+	database.ref().set({
+			playerWon: players[winnerID].name
+	});
 }
 function newGame(){
 	for (var i = 0; i < players.length; i++) {
