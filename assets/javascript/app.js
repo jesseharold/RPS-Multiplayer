@@ -30,6 +30,14 @@ function initGame(){
 	firebase.initializeApp(config);
 	// get a reference to the database
 	database = firebase.database();
+	
+	// update local data when database changes
+	database.ref().on("value", function(snapshot){
+		console.log(snapshot[0]);
+		//players = snapshot;
+	}, function(error){
+		console.error(error);
+	});
 
 	$("button.play").click(function(){
 		makeMove($(this).data("move"), $(this).parent().data("player")-1);
@@ -47,8 +55,7 @@ function initGame(){
 	//empty input when you click on it
 	$("input.player-name").on("focus", function(){
 		$(this).val("");
-	})
-	//getGameFromStorage();
+	});
 	newGame();
 }
 function makeMove(move, playerID){
@@ -151,11 +158,5 @@ function saveGameToStorage(){
 	database.ref().set(players);
 }
 
-//function getGameFromStorage(){}
 
-database.ref().on("value", function(snapshot){
-	players = snapshot;
-}, function(error){
-	console.error(error);
-});
 $(document).ready(initGame);
