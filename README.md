@@ -10,9 +10,10 @@ https://firebase.google.com/docs/database/web/read-and-write
 For homework, week 7, UCLA coding boot camp
 
 ## TODO: 
- * change local storage to firebase
+ * keep track of player connections
+ * restrict players to two
  * hide the other player's move and score
- * add chat
+ * add chat - can watchers chat, or only players?
  * add color and fonts
  * let player choose hand color? look at this: https://codepen.io/designerJordan/pen/qDEjr
  * (optional) integrate network with your SET game!
