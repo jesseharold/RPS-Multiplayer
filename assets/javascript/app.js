@@ -100,32 +100,28 @@ function displayPlayers(){
 	saveGameToStorage();
 }
 function testMoves(){
-	var moveValues = ["paper", "scissors", "rock"];
+	// more concise way to see who wins
+	// moves in ascending value of power:
+	var moves = ["paper", "scissors", "rock"];
+	var move0 = moves.indexOf(players[0].currentMove);
+	var move1 = moves.indexOf(players[1].currentMove);
 
-	if (players[0].currentMove === "rock"){
-		if (players[1].currentMove === "rock"){
+	// test the difference between the moves' values:
+	switch (move0 - move1){
+		case 0:
+			// the moves are the same
 			return "tie";
-		} else if (players[1].currentMove === "paper"){
-			return 1;
-		} else if (players[1].currentMove === "scissors"){
+		case 1:
+			//if a move is one larger, it wins
 			return 0;
-		}
-	} else if (players[0].currentMove === "paper"){
-		if (players[1].currentMove === "rock"){
-			return 0;
-		} else if (players[1].currentMove === "paper"){
-			return "tie";
-		} else if (players[1].currentMove === "scissors"){
+		case -1:
 			return 1;
-		}
-	} else if (players[0].currentMove === "scissors"){
-		if (players[1].currentMove === "rock"){
+		case 2:
+			// 2 means rock v paper, paper wins
 			return 1;
-		} else if (players[1].currentMove === "paper"){
+		case -2:
+			// neg 2 means paper v rock, paper wins
 			return 0;
-		} else if (players[1].currentMove === "scissors"){
-			return "tie";
-		}
 	}
 }
 function displayWinner(winnerID){

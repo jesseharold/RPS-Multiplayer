@@ -51,3 +51,11 @@ Create a game that suits this user story:
 * Find the exercises that you did in class and redo them from scratch. It might seem redundant at first, but this will help edify the material.
 * You can also watch videos of this all of our past lectures--we've saved these to the repo.
 * Like always, feel free to contact either your instructor or a TA if you'd like some one-on-one support.
+
+Refer to snapshot methods like `exists()`, `child()`, and `numChildren`:
+https://firebase.google.com/docs/reference/js/firebase.database.DataSnapshot
+
+and the CodersBay solution from Wed/Thurs, showing usage:
+https://uclax.bootcampcontent.com/UCLA-Coding-Boot-Camp/09-16-Class-Content/tree/master/0919-MW/07-firebase/1-Class-Content/7.2/Activities/06-codersbay/SOLVED
+
+But READ THE FIREBASE docs
