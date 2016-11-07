@@ -13,8 +13,12 @@ var players = [
 		currentMove : false
 	}
 ];
+var game = {
+	playersConnected : 0,
+	watchersConnected : 0,
+	chatHistory : []
+};
 var database;
-var chatHistory = [];
 // settings
 
 function initGame(){
@@ -59,24 +63,21 @@ function initGame(){
 	newGame();
 }
 function makeMove(move, playerID){
-	if (!players[playerID].currentMove){
+	if (!players[playerID].currentMove && players[playerID].name){
 		// prevent someone from making multiple moves in a game
+		// you have to set your name before you can make a move
 		players[playerID].currentMove = move;
-
-		var otherPlayer = (playerID+1) % 2;
-		if (players[otherPlayer].currentMove){
-			var winner = testMoves(players[playerID].currentMove, players[otherPlayer].currentMove);
-			displayWinner(winner);
-		}
+		saveGameToStorage();
 		//hide buttons until next move
 		$("section#player"+(playerID+1)).find("div.buttons").hide();
 
-		// use default value if no player name entered
-		if (players[playerID].name === "") {
-			players[playerID].name = "Player " + (playerID+1);
+		var otherPlayer = (playerID+1) % 2;
+		if (players[otherPlayer].currentMove){
+			// both players have made moves
+			var winner = testMoves(players[playerID].currentMove, players[otherPlayer].currentMove);
+			displayWinner(winner);
 		}
 	}
-	saveGameToStorage();
 }
 function displayPlayers(){
 	for (var i = 0; i < players.length; i++) {

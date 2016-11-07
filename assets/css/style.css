@@ -9,11 +9,13 @@ h2 {
 }
 #player1, #player2 {
     float: left;
+    position: relative;
     background-color: #ddd;
     border: 1px black solid;
     margin: 2%;
     padding: 1%;
     width: 40%;
+    height: 260px;
 }
 #result {
     position: absolute;
@@ -43,6 +45,13 @@ button.play {
 }
 #player2 .name, #player2 .score {
     text-align: right;
+}
+.score {
+    position: absolute;
+    bottom: 3px;
+}
+#player2 .score {
+    right: 10px;
 }
 /* got this from csstricks.com */
 #player2 img.hand-image {

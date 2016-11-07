@@ -10,10 +10,12 @@ https://firebase.google.com/docs/database/web/read-and-write
 For homework, week 7, UCLA coding boot camp
 
 ## TODO: 
- * keep track of player connections
+ * hide other player's move until you make your move
  * restrict players to two
- * hide the other player's move and score
- * add chat - can watchers chat, or only players?
+ * display who's connected, # of non-players watching
+ * when a player disconnects, put game back into waiting for players mode
+ * add chat 
+ * allow watchers to chat, too?
  * add color and fonts
  * let player choose hand color? look at this: https://codepen.io/designerJordan/pen/qDEjr
  * (optional) integrate network with your SET game!
