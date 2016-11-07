@@ -33,8 +33,8 @@ function initGame(){
 	
 	// update local data when database changes
 	database.ref("players").on("value", function(snapshot){
-		//console.log(snapshot.val()[0]);
 		players = snapshot.val();
+		displayPlayers();
 	}, function(error){
 		console.error(error);
 	});
@@ -50,7 +50,7 @@ function initGame(){
 			.find("div.buttons")
 			.data("player");
 		players[playerNumber-1].name = input;
-		displayPlayers();
+		saveGameToStorage();
 	});
 	//empty input when you click on it
 	$("input.player-name").on("focus", function(){
@@ -76,7 +76,7 @@ function makeMove(move, playerID){
 			players[playerID].name = "Player " + (playerID+1);
 		}
 	}
-	displayPlayers();
+	saveGameToStorage();
 }
 function displayPlayers(){
 	for (var i = 0; i < players.length; i++) {
@@ -133,7 +133,7 @@ function displayWinner(winnerID){
 		var otherPlayer = (winnerID+1) % 2;
 		players[otherPlayer].losses++;
 	}
-	displayPlayers();
+	saveGameToStorage();
 	var newGameButton = $("<button>");
 	newGameButton
 		.text("Play Again")
@@ -147,7 +147,7 @@ function newGame(){
 		$("section#player"+(i+1)).find("div.buttons").show();
 	}
 	$("#result #display").empty();
-	displayPlayers();
+	saveGameToStorage();
 
 }
 function saveGameToStorage(){
