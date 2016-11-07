@@ -65,7 +65,7 @@ function makeMove(move, playerID){
 
 		var otherPlayer = (playerID+1) % 2;
 		if (players[otherPlayer].currentMove){
-			var winner = testMoves();
+			var winner = testMoves(players[playerID].currentMove, players[otherPlayer].currentMove);
 			displayWinner(winner);
 		}
 		//hide buttons until next move
@@ -99,12 +99,12 @@ function displayPlayers(){
 	// store the game each time it changes:
 	saveGameToStorage();
 }
-function testMoves(){
+function testMoves(moveZero, moveOne){
 	// more concise way to see who wins
 	// moves in ascending value of power:
 	var moves = ["paper", "scissors", "rock"];
-	var move0 = moves.indexOf(players[0].currentMove);
-	var move1 = moves.indexOf(players[1].currentMove);
+	var move0 = moves.indexOf(moveZero);
+	var move1 = moves.indexOf(moveOne);
 
 	// test the difference between the moves' values:
 	switch (move0 - move1){
