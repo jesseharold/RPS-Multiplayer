@@ -28,6 +28,20 @@ h2 {
     color: #fff;
     text-align: center;
 }
+#chat {
+    border: aqua 2px solid;
+    background-color: antiquewhite;
+    width: 450px;
+    height: 200px;
+    clear: both;
+    margin: auto;
+}
+#chat-history {
+    overflow: auto;
+    width: 98%;
+    height: 160px;
+    margin: -10px 0 0 10px;
+}
 .buttons {
     text-align: center;
 }

@@ -1,10 +1,9 @@
 //global variables
-var players = [{gameState:0}];
-var game = {
-	playersConnected : 0,
-	watchersConnected : 0,
-	chatHistory : []
-};
+var players = [
+	{
+		chatHistory : [{anon:"first Chat"}]
+	}
+	];
 var database;
 var myPlayer;
 var opponent;
@@ -51,10 +50,22 @@ function initGame(){
 			saveGameToStorage();
 		}
 	});
+	$("button#send-chat").click(function(){
+		var chatter = "anon";
+		if (players[myPlayer]){
+			chatter = players[myPlayer].name;
+		}
+		var msg = $(this).prev("input").val().trim();
+		$(this).prev("input").val("");
+		players[0].chatHistory.push({name:chatter, message:msg});
+		saveGameToStorage();
+	})
+
 	//empty input when you click on it
-	$("input.player-name").on("focus", function(){
+	$("input").on("focus", function(){
 		$(this).val("");
 	});
+
 	newGame();
 }
 function makeMove(move, playerID){
@@ -83,6 +94,7 @@ function displayPlayers(){
 			section.find(".move").html(handImage);
 		} else {
 			section.find(".move").html("");
+			$("section#player1").find("div.buttons").show();
 		}
 	}
 	//display opponent
@@ -106,6 +118,15 @@ function displayPlayers(){
 			var winner = testMoves(players[opponent].currentMove, players[myPlayer].currentMove);
 			displayWinner(winner);
 		}
+	}
+	//display Chat
+	$("#chat-history").empty();
+	for(var i = 1; i < players[0].chatHistory.length; i++){
+		var div = $("<div>").addClass("chat-message");
+		var txt = '<span class="chatter">' + players[0].chatHistory[i].name + ": </span>";
+		txt += players[0].chatHistory[i].message;
+		div.html(txt);
+		$("#chat-history").prepend(div);
 	}
 }
 function testMoves(myMove, theirMove){
