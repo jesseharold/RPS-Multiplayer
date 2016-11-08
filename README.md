@@ -10,11 +10,13 @@ https://firebase.google.com/docs/database/web/read-and-write
 For homework, week 7, UCLA coding boot camp
 
 ## TODO: 
- * Don't display move buttons until both players click on play again
- * display who's connected, # of non-players watching
- * when a player disconnects, put game back into waiting for players mode
- * allow watchers to chat, too?
- * add color and fonts
+ * change newGame() so it doesn't reset all players, initGame() so it doesn't wipe out all players on page refresh
+ * add instructions - "enter your name to join the game"
+ * Don't display move buttons until both players click on play again, display waiting for (name)
+ * # of non-players watching (connected)
+ * when a player disconnects, notify and put game back into waiting for player 2 mode
+ * inprove colors
+ * make chat submit on enter keypress
  * let player choose hand color? look at this: https://codepen.io/designerJordan/pen/qDEjr
  * (optional) integrate network with your SET game!
 
@@ -52,10 +54,10 @@ Create a game that suits this user story:
 * You can also watch videos of this all of our past lectures--we've saved these to the repo.
 * Like always, feel free to contact either your instructor or a TA if you'd like some one-on-one support.
 
-Refer to snapshot methods like `exists()`, `child()`, and `numChildren`:
+* Refer to snapshot methods like `exists()`, `child()`, and `numChildren`
 https://firebase.google.com/docs/reference/js/firebase.database.DataSnapshot
 
-and the CodersBay solution from Wed/Thurs, showing usage:
+* and the CodersBay solution from Wed/Thurs, showing usage:
 https://uclax.bootcampcontent.com/UCLA-Coding-Boot-Camp/09-16-Class-Content/tree/master/0919-MW/07-firebase/1-Class-Content/7.2/Activities/06-codersbay/SOLVED
 
-But READ THE FIREBASE docs
+* READ THE FIREBASE docs

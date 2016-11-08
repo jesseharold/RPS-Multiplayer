@@ -47,7 +47,7 @@ function initGame(){
 				losses : 0,
 				currentMove : false
 			});
-			saveGameToStorage();
+			saveGameToDB();
 		}
 	});
 
@@ -63,7 +63,7 @@ function initGame(){
 		var msg = $(this).prev("input").val().trim();
 		$(this).prev("input").val("");
 		players[0].chatHistory.push({name:chatter, message:msg, owner:chatOwner});
-		saveGameToStorage();
+		saveGameToDB();
 	})
 
 	//empty input when you click on it
@@ -78,7 +78,7 @@ function makeMove(move, playerID){
 		// prevent someone from making multiple moves in a game
 		// you can't make a move unless both players are present
 		players[playerID].currentMove = move;
-		saveGameToStorage();
+		saveGameToDB();
 		//hide buttons until next move
 		$("section#player1").find("div.buttons").hide();
 	}
@@ -176,7 +176,7 @@ function displayWinner(didIwin){
 		winner.wins++;
 		players[opponent].losses++;
 	}
-	//saveGameToStorage();
+	//saveGameToDB();
 	var newGameButton = $("<button>");
 	newGameButton
 		.text("Play Again")
@@ -191,10 +191,9 @@ function newGame(){
 	}
 	$("#result #display").empty();
 	$("#result").hide();
-	saveGameToStorage();
-
+	saveGameToDB();
 }
-function saveGameToStorage(){
+function saveGameToDB(){
 	database.ref("players").set(players);
 }
 
