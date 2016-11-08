@@ -181,7 +181,7 @@ function displayWinner(didIwin){
 	newGameButton
 		.text("Play Again")
 		.attr("id", "new-game-button");
-	$("#result #display").append(newGameButton);
+	$("#result").show().find("#display").append(newGameButton);
 }
 function newGame(){
 	for (var i = 0; i < players.length; i++) {
@@ -190,6 +190,7 @@ function newGame(){
 		$("section#player1").find("div.buttons").show();
 	}
 	$("#result #display").empty();
+	$("#result").hide();
 	saveGameToStorage();
 
 }
