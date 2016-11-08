@@ -23,6 +23,8 @@ function initGame(){
 	// get a reference to the database
 	database = firebase.database();
 	
+	// **** Event Listeners *****
+
 	// update local data when database changes
 	database.ref("players").on("value", function(snapshot){
 		players = snapshot.val();
@@ -35,36 +37,15 @@ function initGame(){
 		makeMove($(this).data("move"), myPlayer);
 	});
 	$("#result").on("click", "#new-game-button", newGame);
+
 	$("button.set-name").click(function(){
-		if (players.length <= 3){
-			// don't add a new player if there are already 2
-			myPlayer = players.length;
-			opponent = 3 - myPlayer;
-			var newName = $(this).prev("input.player-name").val();
-			players.push({
-				name : newName,
-				wins : 0,
-				losses : 0,
-				currentMove : false
-			});
-			saveGameToDB();
-		}
+		createPlayer($(this).prev("input.player-name").val());
 	});
 
 	$("button#send-chat").click(function(){
-		var chatter = "anon";
-		if (players[myPlayer]){
-			chatter = players[myPlayer].name;
-		}
-		var chatOwner = false;
-		if (myPlayer){
-			chatOwner = myPlayer;
-		}
-		var msg = $(this).prev("input").val().trim();
+		sendChat($(this).prev("input").val().trim());
 		$(this).prev("input").val("");
-		players[0].chatHistory.push({name:chatter, message:msg, owner:chatOwner});
-		saveGameToDB();
-	})
+	});
 
 	//empty input when you click on it
 	$("input").on("focus", function(){
@@ -72,6 +53,31 @@ function initGame(){
 	});
 
 	newGame();
+}
+function createPlayer(newName){
+	if (players.length <= 3){
+		// don't add a new player if there are already 2
+		myPlayer = players.length;
+		opponent = 3 - myPlayer;
+		players.push({
+			name : newName,
+			wins : 0,
+			losses : 0,
+			currentMove : false,
+			ready : true
+		});
+		saveGameToDB();
+	}
+}
+function sendChat(msg){
+	var chatter = "anon";
+	var chatOwner = false;
+	if (players[myPlayer]){
+		chatter = players[myPlayer].name;
+		chatOwner = myPlayer;
+	}
+	players[0].chatHistory.push({name:chatter, message:msg, owner:chatOwner});
+	saveGameToDB();
 }
 function makeMove(move, playerID){
 	if (!players[playerID].currentMove && players.length === 3){
@@ -124,6 +130,13 @@ function displayGame(){
 			displayWinner(winner);
 		}
 	}
+	//display buttons if both players are present 
+	if(players[opponent] && players[myPlayer]){
+		if (players[opponent].ready && players[myPlayer].ready){
+			$("button.play").show();
+		}
+	}
+
 	//display Chat
 	$("#chat-history").empty();
 	for(var i = 1; i < players[0].chatHistory.length; i++){
@@ -177,6 +190,7 @@ function displayWinner(didIwin){
 		players[opponent].losses++;
 	}
 	//saveGameToDB();
+	players[myPlayer].ready = false;
 	var newGameButton = $("<button>");
 	newGameButton
 		.text("Play Again")
@@ -184,11 +198,11 @@ function displayWinner(didIwin){
 	$("#result").show().find("#display").append(newGameButton);
 }
 function newGame(){
-	for (var i = 0; i < players.length; i++) {
-		players[i].currentMove = false;
-		//show buttons
-		$("section#player1").find("div.buttons").show();
+	if(players[myPlayer]){
+		players[myPlayer].currentMove = false;
+		players[myPlayer].ready = true;
 	}
+	$("section#player1").find("div.buttons").show();
 	$("#result #display").empty();
 	$("#result").hide();
 	saveGameToDB();

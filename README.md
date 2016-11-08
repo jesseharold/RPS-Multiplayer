@@ -10,8 +10,6 @@ https://firebase.google.com/docs/database/web/read-and-write
 For homework, week 7, UCLA coding boot camp
 
 ## TODO: 
- * change newGame() so it doesn't reset all players, initGame() so it doesn't wipe out all players on page refresh
- * add instructions - "enter your name to join the game"
  * Don't display move buttons until both players click on play again, display waiting for (name)
  * # of non-players watching (connected)
  * when a player disconnects, notify and put game back into waiting for player 2 mode
