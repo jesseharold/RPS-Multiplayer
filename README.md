@@ -13,7 +13,6 @@ For homework, week 7, UCLA coding boot camp
  * Don't display move buttons until both players click on play again
  * display who's connected, # of non-players watching
  * when a player disconnects, put game back into waiting for players mode
- * add chat 
  * allow watchers to chat, too?
  * add color and fonts
  * let player choose hand color? look at this: https://codepen.io/designerJordan/pen/qDEjr

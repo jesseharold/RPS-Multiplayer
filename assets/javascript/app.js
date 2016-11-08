@@ -26,7 +26,7 @@ function initGame(){
 	// update local data when database changes
 	database.ref("players").on("value", function(snapshot){
 		players = snapshot.val();
-		displayPlayers();
+		displayGame();
 	}, function(error){
 		console.error(error);
 	});
@@ -50,14 +50,19 @@ function initGame(){
 			saveGameToStorage();
 		}
 	});
+
 	$("button#send-chat").click(function(){
 		var chatter = "anon";
 		if (players[myPlayer]){
 			chatter = players[myPlayer].name;
 		}
+		var chatOwner = false;
+		if (myPlayer){
+			chatOwner = myPlayer;
+		}
 		var msg = $(this).prev("input").val().trim();
 		$(this).prev("input").val("");
-		players[0].chatHistory.push({name:chatter, message:msg});
+		players[0].chatHistory.push({name:chatter, message:msg, owner:chatOwner});
 		saveGameToStorage();
 	})
 
@@ -79,7 +84,7 @@ function makeMove(move, playerID){
 	}
 	
 }
-function displayPlayers(){
+function displayGame(){
 	//display current player
 	if(myPlayer){
 		var section = $("#player1");
@@ -123,6 +128,9 @@ function displayPlayers(){
 	$("#chat-history").empty();
 	for(var i = 1; i < players[0].chatHistory.length; i++){
 		var div = $("<div>").addClass("chat-message");
+		if (players[0].chatHistory[i].owner){
+			div.addClass("chat-message-" + players[0].chatHistory[i].owner)
+		}
 		var txt = '<span class="chatter">' + players[0].chatHistory[i].name + ": </span>";
 		txt += players[0].chatHistory[i].message;
 		div.html(txt);
