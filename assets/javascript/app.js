@@ -1,24 +1,13 @@
 //global variables
-var players = [
-	{
-		name : "",
-		wins : 0,
-		losses : 0,
-		currentMove : false
-	},
-	{
-		name : "",
-		wins : 0,
-		losses : 0,
-		currentMove : false
-	}
-];
+var players = ["dummy"];
 var game = {
 	playersConnected : 0,
 	watchersConnected : 0,
 	chatHistory : []
 };
 var database;
+var myPlayer;
+var opponent;
 // settings
 
 function initGame(){
@@ -44,17 +33,24 @@ function initGame(){
 	});
 
 	$("button.play").click(function(){
-		makeMove($(this).data("move"), $(this).parent().data("player")-1);
+		makeMove($(this).data("move"), myPlayer);
 	});
 	$("#result").on("click", "#new-game-button", 	newGame);
 	$("button.set-name").click(function(){
-		var input = $(this).prev("input").val();
-		var playerNumber = $(this)
-			.parents("section")
-			.find("div.buttons")
-			.data("player");
-		players[playerNumber-1].name = input;
-		saveGameToStorage();
+		if (players.length < 4){
+			// don't add a new player if there are already 2
+			myPlayer = players.length;
+			opponent = 3 - myPlayer;
+			var newName = $(this).prev("input.player-name").val();
+			players.push({
+				name : newName,
+				wins : 0,
+				losses : 0,
+				currentMove : false
+			});
+			console.log("myPlayer: " + myPlayer + ", opponent: " + opponent);
+			saveGameToStorage();
+		}
 	});
 	//empty input when you click on it
 	$("input.player-name").on("focus", function(){
@@ -69,36 +65,50 @@ function makeMove(move, playerID){
 		players[playerID].currentMove = move;
 		saveGameToStorage();
 		//hide buttons until next move
-		$("section#player"+(playerID+1)).find("div.buttons").hide();
+		$("section#player"+(playerID)).find("div.buttons").hide();
 
-		var otherPlayer = (playerID+1) % 2;
-		if (players[otherPlayer].currentMove){
+		if (players[opponent].currentMove){
 			// both players have made moves
-			var winner = testMoves(players[playerID].currentMove, players[otherPlayer].currentMove);
+			var winner = testMoves(move, players[opponent].currentMove);
 			displayWinner(winner);
 		}
 	}
+	
 }
 function displayPlayers(){
-	for (var i = 0; i < players.length; i++) {
-		var section = $("#player" + (i+1));
-		if (players[i].name){
-			section.find(".name").text(players[i].name);
-		}
-		var scoreText = "Wins: " + players[i].wins + ", Losses: " + players[i].losses;
+	//display current player
+	if(myPlayer){
+		var section = $("#player1");
+		section.find(".name").text(players[myPlayer].name);
+		var scoreText = "Wins: " + players[myPlayer].wins + ", Losses: " + players[myPlayer].losses;
 		section.find(".score").text(scoreText);
-		if (players[i].currentMove){
+		if (players[myPlayer].currentMove){
 			var handImage = $("<img>");
 			handImage
-				.attr("src", "assets/images/" + players[i].currentMove + ".png")
+				.attr("src", "assets/images/" + players[myPlayer].currentMove + ".png")
 				.addClass("hand-image");
 			section.find(".move").html(handImage);
+			//show opponent's move
+			if (players[opponent].currentMove){
+			var handImage = $("<img>");
+			handImage
+				.attr("src", "assets/images/" + players[opponent].currentMove + ".png")
+				.addClass("hand-image");
+			section.find(".move").html(handImage);
+			} else {
+				section.find(".move").html("");
+			}
+
 		} else {
 			section.find(".move").html("");
 		}
 	}
-	// store the game each time it changes:
-	saveGameToStorage();
+	//display opponent
+	if (players[opponent]){
+		console.log(players[opponent]);
+		section = $("#player2");
+		section.find(".name").text(players[opponent].name);
+	}
 }
 function testMoves(moveZero, moveOne){
 	// more concise way to see who wins
