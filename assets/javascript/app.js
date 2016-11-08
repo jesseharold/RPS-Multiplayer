@@ -1,5 +1,5 @@
 //global variables
-var players = ["dummy"];
+var players = [{gameState:0}];
 var game = {
 	playersConnected : 0,
 	watchersConnected : 0,
@@ -35,9 +35,9 @@ function initGame(){
 	$("button.play").click(function(){
 		makeMove($(this).data("move"), myPlayer);
 	});
-	$("#result").on("click", "#new-game-button", 	newGame);
+	$("#result").on("click", "#new-game-button", newGame);
 	$("button.set-name").click(function(){
-		if (players.length < 4){
+		if (players.length <= 3){
 			// don't add a new player if there are already 2
 			myPlayer = players.length;
 			opponent = 3 - myPlayer;
@@ -48,7 +48,6 @@ function initGame(){
 				losses : 0,
 				currentMove : false
 			});
-			console.log("myPlayer: " + myPlayer + ", opponent: " + opponent);
 			saveGameToStorage();
 		}
 	});
@@ -65,7 +64,7 @@ function makeMove(move, playerID){
 		players[playerID].currentMove = move;
 		saveGameToStorage();
 		//hide buttons until next move
-		$("section#player"+(playerID)).find("div.buttons").hide();
+		$("section#player1").find("div.buttons").hide();
 	}
 	
 }
@@ -82,22 +81,22 @@ function displayPlayers(){
 				.attr("src", "assets/images/" + players[myPlayer].currentMove + ".png")
 				.addClass("hand-image");
 			section.find(".move").html(handImage);
-			//show opponent's move
 		} else {
 			section.find(".move").html("");
 		}
 	}
 	//display opponent
 	if (players[opponent]){
-		//console.log(players[opponent]);
 		section = $("#player2");
-		section.find(".name").text(players[opponent].name);
-		if (players[opponent].currentMove){
-			var handImage = $("<img>");
-			handImage
-				.attr("src", "assets/images/" + players[opponent].currentMove + ".png")
-				.addClass("hand-image");
-			section.find(".move").html(handImage);
+		if (players[opponent].name){
+			section.find(".name").text(players[opponent].name);
+		}
+		if (players[opponent].currentMove && players[myPlayer].currentMove){
+				var handImage = $("<img>");
+				handImage
+					.attr("src", "assets/images/" + players[opponent].currentMove + ".png")
+					.addClass("hand-image");
+				section.find(".move").html(handImage);
 		} else {
 			section.find(".move").html("");
 		}
@@ -115,7 +114,6 @@ function testMoves(myMove, theirMove){
 	var moves = ["paper", "scissors", "rock"];
 	var mine = moves.indexOf(myMove);
 	var theirs = moves.indexOf(theirMove);
-	console.log(myMove + ", " + theirMove);
 	// test the difference between the moves' values:
 	switch (mine - theirs){
 		case 0:
@@ -160,7 +158,7 @@ function newGame(){
 	for (var i = 0; i < players.length; i++) {
 		players[i].currentMove = false;
 		//show buttons
-		$("section#player"+(i+1)).find("div.buttons").show();
+		$("section#player1").find("div.buttons").show();
 	}
 	$("#result #display").empty();
 	saveGameToStorage();
