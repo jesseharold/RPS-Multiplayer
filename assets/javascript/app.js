@@ -133,7 +133,7 @@ function testMoves(myMove, theirMove){
 	}
 }
 function displayWinner(didIwin){
-	console.log(didIwin);
+	//console.log(didIwin);
 	if (didIwin === "tie"){
 		$("#result #display").text("Tie!");
 	} else {

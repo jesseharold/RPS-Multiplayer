@@ -10,7 +10,7 @@ https://firebase.google.com/docs/database/web/read-and-write
 For homework, week 7, UCLA coding boot camp
 
 ## TODO: 
- * hide other player's move until you make your move
+ * Don't display move buttons until both players click on play again
  * display who's connected, # of non-players watching
  * when a player disconnects, put game back into waiting for players mode
  * add chat 
