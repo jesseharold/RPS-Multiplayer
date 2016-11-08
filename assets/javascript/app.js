@@ -89,19 +89,23 @@ function makeMove(move, playerID){
 		// prevent someone from making multiple moves in a game
 		// you can't make a move unless both players are present
 		players[playerID].currentMove = move;
-		saveGameToDB();
+		players[myPlayer].ready = false;
 		//hide buttons until next move
 		$("section#player1").find("div.buttons").hide();
+		saveGameToDB();
 	}
 	
 }
 function displayGame(){
 	//display current player
 	if(myPlayer){
+		// show name and score, if it exists
 		var section = $("#player1");
 		section.find(".name").text(players[myPlayer].name);
 		var scoreText = "Wins: " + players[myPlayer].wins + ", Losses: " + players[myPlayer].losses;
 		section.find(".score").text(scoreText);
+
+		// show image for move, if it exists
 		if (players[myPlayer].currentMove){
 			var handImage = $("<img>");
 			handImage
@@ -109,16 +113,18 @@ function displayGame(){
 				.addClass("hand-image");
 			section.find(".move").html(handImage);
 		} else {
+			// clear previous image of move
 			section.find(".move").html("");
-			$("section#player1").find("div.buttons").show();
 		}
 	}
 	//display opponent
 	if (players[opponent]){
+		// show name, if it exists
 		section = $("#player2");
 		if (players[opponent].name){
 			section.find(".name").text(players[opponent].name);
 		}
+		// show image for move, if it exists AND if I have already made my move
 		if (players[opponent].currentMove && players[myPlayer].currentMove){
 				var handImage = $("<img>");
 				handImage
@@ -126,20 +132,19 @@ function displayGame(){
 					.addClass("hand-image");
 				section.find(".move").html(handImage);
 		} else {
+			// remove last image for move
 			section.find(".move").html("");
 		}
 		//check if both moves have been taken
 		if (players[opponent].currentMove && players[myPlayer].currentMove){
-			// both players have made moves
 			var winner = testMoves(players[opponent].currentMove, players[myPlayer].currentMove);
 			displayWinner(winner);
 		}
 	}
-	//display buttons if both players are present 
+	//display buttons if both players are present and ready
 	if(players[opponent] && players[myPlayer]){
-console.log(players[opponent].ready + ", " + players[opponent].ready);
 		if (players[opponent].ready && players[myPlayer].ready){
-			$("button.play").show();
+			$("#player1 .buttons").show();
 		}
 	}
 
@@ -194,8 +199,6 @@ function displayWinner(didIwin){
 		winner.wins++;
 		players[opponent].losses++;
 	}
-	players[myPlayer].ready = false;
-	saveGameToDB();
 	var newGameButton = $("<button>");
 	newGameButton
 		.text("Play Again")
@@ -207,7 +210,6 @@ function newGame(){
 		players[myPlayer].currentMove = false;
 		players[myPlayer].ready = true;
 	}
-	$("section#player1").find("div.buttons").show();
 	$("#result #display").empty();
 	$("#result").hide();
 	saveGameToDB();
