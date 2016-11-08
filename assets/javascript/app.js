@@ -47,7 +47,7 @@ function initGame(){
 		$(this).prev("input").val("");
 	});
 
-	//empty input when you click on it
+	//empty name input when you click on it
 	$("input").on("focus", function(){
 		$(this).val("");
 	});
@@ -57,8 +57,11 @@ function initGame(){
 function createPlayer(newName){
 	if (players.length <= 3){
 		// don't add a new player if there are already 2
+		// claim next available player ID:
 		myPlayer = players.length;
+		// opponent gets the other value (either 1 or 2)
 		opponent = 3 - myPlayer;
+
 		players.push({
 			name : newName,
 			wins : 0,
@@ -66,10 +69,12 @@ function createPlayer(newName){
 			currentMove : false,
 			ready : true
 		});
+
 		saveGameToDB();
 	}
 }
 function sendChat(msg){
+	// default values
 	var chatter = "anon";
 	var chatOwner = false;
 	if (players[myPlayer]){
@@ -132,6 +137,7 @@ function displayGame(){
 	}
 	//display buttons if both players are present 
 	if(players[opponent] && players[myPlayer]){
+console.log(players[opponent].ready + ", " + players[opponent].ready);
 		if (players[opponent].ready && players[myPlayer].ready){
 			$("button.play").show();
 		}
@@ -175,7 +181,6 @@ function testMoves(myMove, theirMove){
 	}
 }
 function displayWinner(didIwin){
-	//console.log(didIwin);
 	if (didIwin === "tie"){
 		$("#result #display").text("Tie!");
 	} else {
@@ -189,8 +194,8 @@ function displayWinner(didIwin){
 		winner.wins++;
 		players[opponent].losses++;
 	}
-	//saveGameToDB();
 	players[myPlayer].ready = false;
+	saveGameToDB();
 	var newGameButton = $("<button>");
 	newGameButton
 		.text("Play Again")
