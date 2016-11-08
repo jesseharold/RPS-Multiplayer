@@ -36,7 +36,7 @@ function initGame(){
 	$("button.play").click(function(){
 		makeMove($(this).data("move"), myPlayer);
 	});
-	$("#result").on("click", "#new-game-button", newGame);
+	$("#result").on("click", "#new-game-button", checkForNewGame);
 
 	$("button.set-name").click(function(){
 		createPlayer($(this).prev("input.player-name").val());
@@ -145,6 +145,8 @@ function displayGame(){
 	if(players[opponent] && players[myPlayer]){
 		if (players[opponent].ready && players[myPlayer].ready){
 			$("#player1 .buttons").show();
+			$("#result #display").empty();
+			$("#result").hide();
 		}
 	}
 
@@ -205,11 +207,17 @@ function displayWinner(didIwin){
 		.attr("id", "new-game-button");
 	$("#result").show().find("#display").append(newGameButton);
 }
-function newGame(){
-	if(players[myPlayer]){
-		players[myPlayer].currentMove = false;
-		players[myPlayer].ready = true;
+function checkForNewGame(){
+	players[myPlayer].currentMove = false;
+	players[myPlayer].ready = true;
+	saveGameToDB();
+	if(players[opponent].ready){
+		newGame();
+	} else {
+		$("#result #display").text("waiting for all players...");
 	}
+}
+function newGame(){
 	$("#result #display").empty();
 	$("#result").hide();
 	saveGameToDB();
