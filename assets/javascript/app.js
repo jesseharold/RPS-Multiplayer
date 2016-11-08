@@ -52,6 +52,18 @@ function initGame(){
 		$(this).val("");
 	});
 
+	// make chat send on enter keypress
+	$("input#chat-box").on("focus", function(){
+		$("body").on("keypress", function(event){
+			if (event.charCode === 13) {
+				// if enter key is pressed
+				$("button#send-chat").trigger("click");
+			}
+		});
+	}).on("focusout", function(){
+		$("body").off("keypress");
+	});
+
 	newGame();
 }
 function createPlayer(newName){

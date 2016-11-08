@@ -10,12 +10,11 @@ https://firebase.google.com/docs/database/web/read-and-write
 For homework, week 7, UCLA coding boot camp
 
 ## TODO: 
- * Don't display moves buttons until *both* players click on play again, display waiting for (name)
+ * fix scoring bug
+ * try and clarify logic
  * # of non-players watching (connected)
  * when a player disconnects, notify and put game back into waiting for player 2 mode
- * inprove colors
- * make chat submit on enter keypress
- * let player choose hand color? look at this: https://codepen.io/designerJordan/pen/qDEjr
+ * (optional) let player choose hand color -  look at this: https://codepen.io/designerJordan/pen/qDEjr
  * (optional) integrate network with your SET game!
 
 
