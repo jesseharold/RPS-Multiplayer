@@ -59,19 +59,13 @@ function initGame(){
 	newGame();
 }
 function makeMove(move, playerID){
-	if (!players[playerID].currentMove && players[playerID].name){
+	if (!players[playerID].currentMove && players.length === 3){
 		// prevent someone from making multiple moves in a game
-		// you have to set your name before you can make a move
+		// you can't make a move unless both players are present
 		players[playerID].currentMove = move;
 		saveGameToStorage();
 		//hide buttons until next move
 		$("section#player"+(playerID)).find("div.buttons").hide();
-
-		if (players[opponent].currentMove){
-			// both players have made moves
-			var winner = testMoves(move, players[opponent].currentMove);
-			displayWinner(winner);
-		}
 	}
 	
 }
@@ -89,62 +83,73 @@ function displayPlayers(){
 				.addClass("hand-image");
 			section.find(".move").html(handImage);
 			//show opponent's move
-			if (players[opponent].currentMove){
-			var handImage = $("<img>");
-			handImage
-				.attr("src", "assets/images/" + players[opponent].currentMove + ".png")
-				.addClass("hand-image");
-			section.find(".move").html(handImage);
-			} else {
-				section.find(".move").html("");
-			}
-
 		} else {
 			section.find(".move").html("");
 		}
 	}
 	//display opponent
 	if (players[opponent]){
-		console.log(players[opponent]);
+		//console.log(players[opponent]);
 		section = $("#player2");
 		section.find(".name").text(players[opponent].name);
+		if (players[opponent].currentMove){
+			var handImage = $("<img>");
+			handImage
+				.attr("src", "assets/images/" + players[opponent].currentMove + ".png")
+				.addClass("hand-image");
+			section.find(".move").html(handImage);
+		} else {
+			section.find(".move").html("");
+		}
+		//check if both moves have been taken
+		if (players[opponent].currentMove && players[myPlayer].currentMove){
+			// both players have made moves
+			var winner = testMoves(players[opponent].currentMove, players[myPlayer].currentMove);
+			displayWinner(winner);
+		}
 	}
 }
-function testMoves(moveZero, moveOne){
+function testMoves(myMove, theirMove){
 	// more concise way to see who wins
 	// moves in ascending value of power:
 	var moves = ["paper", "scissors", "rock"];
-	var move0 = moves.indexOf(moveZero);
-	var move1 = moves.indexOf(moveOne);
-
+	var mine = moves.indexOf(myMove);
+	var theirs = moves.indexOf(theirMove);
+	console.log(myMove + ", " + theirMove);
 	// test the difference between the moves' values:
-	switch (move0 - move1){
+	switch (mine - theirs){
 		case 0:
 			// the moves are the same
 			return "tie";
 		case 1:
 			//if a move is one larger, it wins
-			return 0;
+			return false;
 		case -1:
-			return 1;
+			return true;
 		case 2:
 			// 2 means rock v paper, paper wins
-			return 1;
+			return true;
 		case -2:
 			// neg 2 means paper v rock, paper wins
-			return 0;
+			return false;
 	}
 }
-function displayWinner(winnerID){
-	if (winnerID === "tie"){
+function displayWinner(didIwin){
+	console.log(didIwin);
+	if (didIwin === "tie"){
 		$("#result #display").text("Tie!");
 	} else {
-		$("#result #display").text(players[winnerID].name + " wins!");
-		players[winnerID].wins++;
-		var otherPlayer = (winnerID+1) % 2;
-		players[otherPlayer].losses++;
+		var winner;
+		if (didIwin){
+			winner = players[myPlayer];
+		} else {
+			winner = players[opponent];
+		}
+		$("#result #display").text(winner.name + " wins!");
+		winner.wins++;
+		players[opponent].losses++;
 	}
-	saveGameToStorage();
+	//saveGameToStorage();
 	var newGameButton = $("<button>");
 	newGameButton
 		.text("Play Again")
