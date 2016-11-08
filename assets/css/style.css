@@ -54,6 +54,12 @@ h2 {
     height: 160px;
     margin: -10px 0 0 10px;
 }
+.chat-message{
+    margin: 3px 0;
+}
+.chatter{
+    font-style: italic;
+}
 .chat-message-1{
     background-color: aliceblue;
 }
