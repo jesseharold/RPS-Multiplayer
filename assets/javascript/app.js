@@ -7,6 +7,8 @@ var players = [
 var database;
 var myPlayer;
 var opponent;
+var iWon;
+
 // settings
 
 function initGame(){
@@ -200,18 +202,18 @@ function testMoves(myMove, theirMove){
 	}
 }
 function displayWinner(didIwin){
+	//set the global variable to save to DB
+	iWon = didIwin;
 	if (didIwin === "tie"){
 		$("#result #display").text("Tie!");
 	} else {
 		var winner;
 		if (didIwin){
-			winner = players[myPlayer];
+			winner = players[myPlayer].name;
 		} else {
-			winner = players[opponent];
+			winner = players[opponent].name;
 		}
-		$("#result #display").text(winner.name + " wins!");
-		winner.wins++;
-		players[opponent].losses++;
+		$("#result #display").text(winner + " wins!");
 	}
 	var newGameButton = $("<button>");
 	newGameButton
@@ -222,6 +224,11 @@ function displayWinner(didIwin){
 function checkForNewGame(){
 	players[myPlayer].currentMove = false;
 	players[myPlayer].ready = true;
+	if (iWon === true){
+		players[myPlayer].wins++;
+	} else if (iWon === false){
+		players[myPlayer].losses++;
+	}
 	saveGameToDB();
 	if(players[opponent].ready){
 		newGame();
@@ -235,6 +242,7 @@ function newGame(){
 	saveGameToDB();
 }
 function saveGameToDB(){
+	console.log("saved");
 	database.ref("players").set(players);
 }
 
