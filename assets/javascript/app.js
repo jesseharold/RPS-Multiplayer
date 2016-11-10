@@ -33,8 +33,10 @@ function initGame(){
 				var newPlayer = createPlayer(numberOfPlayers);
 				newPlayer.timeJoined = Date.now();
 				var con = database.ref('players').push(newPlayer);
+
 				// when I disconnect, remove this player
 				con.onDisconnect().remove();
+
 				// remember the key for my player
 				myKey = con.key;
 			});
@@ -57,16 +59,24 @@ function initGame(){
 	});
 
 	// watch for updates to other players
-	database.ref("players").on("child_added", function(snapshot){
-		if (myKey){
+	database.ref("players").orderByChild("timeJoined").on("value", function(snapshot){
+		if (myKey && !opponent && snapshot.numChildren() > 1){
 			// only add opponent if we already have a player
-			// if opponent already doesn't exist and there's another player, create opponent
-			if(!opponent){
-				console.log("adding opponent");
-				opponent = snapshot.val();
-				opponentKey = snapshot.key;				
-				displayOpponent();
-			} 
+			// if opponent already doesn't exist 
+			// and there's another person connected
+			snapshot.forEach(function(childSnapshot) {
+				if(childSnapshot.val().key !== myKey){
+					//console.log("adding opponent" + childSnapshot.val().name);
+					opponent = childSnapshot.val();
+					opponentKey = childSnapshot.key;				
+					displayOpponent();
+					return true;
+				}
+			});
+			/*
+				
+				
+			*/
 		}
 	}, function(error){
 		console.error("Can't get opponent data: " + error);
@@ -126,7 +136,7 @@ function createPlayer(playerId){
 	return myPlayer;
 }
 function displayMyPlayer(){
-	console.log("displayMyPlayer: " + myPlayer.name);
+	//console.log("displayMyPlayer: " + myPlayer.name);
 	if(myPlayer && myPlayer.name){
 		// show name and score, if it exists
 		var section = $("#player1");
@@ -148,7 +158,7 @@ function displayMyPlayer(){
 	}
 }
 function displayOpponent(){
-	console.log("displayOpponent: " + opponent.name);
+	//console.log("displayOpponent: " + opponent.name);
 	if (opponent && myPlayer){
 		// show name, if it exists
 		section = $("#player2");
