@@ -23,21 +23,19 @@ function initGame(){
 // **** Event Listeners *****
 
 	// update local data when database changes
-	database.ref("players").on("value", function(snapshot){
-		//opponent = snapshot.child().val();
-		//displayOpponent();
+	database.ref("players").orderByChild("id").on("value", function(snapshot){
+		if(myPlayer){
+			snapshot.forEach(function(childSnapshot) {
+				if(childSnapshot.val().id === myPlayer.id){
+					displayMyPlayer();
+				} else {
+					displayOpponent();
+				}
+			});
+		}
 	}, function(error){
 		console.error("Can't get opponent data: " + error);
 	});
-	/*
-	database.ref("players").on("value", function(snapshot){
-		//myPlayer = snapshot.val();
-		//displayMyPlayer();
-		console.log("players updated in DB");
-	}, function(error){
-		console.error("Can't get myPlayer data: " + error);
-	});
-	*/
 	database.ref("chatLog").on("value", function(snapshot){
 		displayChats(snapshot.val());
 	}, function(error){
@@ -95,27 +93,6 @@ function createPlayer(newName){
 		database.ref("players").push(myPlayer);
 	});
 }
-function sendChat(msg){
-	// default values
-	var chatter = "anon";
-	var chatOwner = false;
-	if (myPlayer && myPlayer.name){
-		chatter = myPlayer.name;
-		chatOwner = myPlayer.id;
-	}
-	database.ref("chatLog").push({name:chatter, message:msg, owner:chatOwner});
-}
-function makeMove(move, playerID){
-	if (myPlayer.currentMove && opponent){
-		// prevent someone from making multiple moves in a round
-		// you can't make a move unless both players are present
-		myPlayer.currentMove = move;
-		myPlayer.ready = false;
-		//hide buttons until next move
-		$("section#player1").find("div.buttons").hide();
-		saveGameToDB();
-	}
-}
 function displayMyPlayer(){
 	if(myPlayer){
 		// show name and score, if it exists
@@ -166,18 +143,15 @@ function displayOpponent(){
 		}
 	}
 }
-function displayChats(snapshot){
-	$("#chat-history").empty();
-	for (var key in snapshot) {
-		var chat = snapshot[key];
-		var div = $("<div>").addClass("chat-message");
-		if (chat.owner){
-			div.addClass("chat-message-" + chat.owner)
-		}
-		var txt = '<span class="chatter">' + chat.name + ": </span>";
-		txt += chat.message;
-		div.html(txt);
-		$("#chat-history").prepend(div);	
+function makeMove(move, playerID){
+	if (myPlayer.currentMove && opponent){
+		// prevent someone from making multiple moves in a round
+		// you can't make a move unless both players are present
+		myPlayer.currentMove = move;
+		myPlayer.ready = false;
+		//hide buttons until next move
+		$("section#player1").find("div.buttons").hide();
+		saveMyPlayerToDB();
 	}
 }
 function testMoves(myMove, theirMove){
@@ -233,7 +207,7 @@ function checkForNewGame(){
 	} else if (iWon === false){
 		myPlayer.losses++;
 	}
-	saveGameToDB();
+	saveMyPlayerToDB();
 	if(opponent.ready){
 		newGame();
 	} else {
@@ -243,11 +217,37 @@ function checkForNewGame(){
 function newGame(){
 	$("#result #display").empty();
 	$("#result").hide();
-	saveGameToDB();
+	saveMyPlayerToDB();
 }
-function saveGameToDB(){
-	console.log("saved");
-	//database.ref("gameData").set(gameData);
+function saveMyPlayerToDB(){
+	if(myPlayer){
+		var ref = firebase.database().ref("players");
+		ref.orderByChild("id").equalTo(myPlayer.id).set(myPlayer);
+	}
+}
+function sendChat(msg){
+	// default values
+	var chatter = "anon";
+	var chatOwner = false;
+	if (myPlayer && myPlayer.name){
+		chatter = myPlayer.name;
+		chatOwner = myPlayer.id;
+	}
+	database.ref("chatLog").push({name:chatter, message:msg, owner:chatOwner});
+}
+function displayChats(snapshot){
+	$("#chat-history").empty();
+	for (var key in snapshot) {
+		var chat = snapshot[key];
+		var div = $("<div>").addClass("chat-message");
+		if (chat.owner){
+			div.addClass("chat-message-" + chat.owner)
+		}
+		var txt = '<span class="chatter">' + chat.name + ": </span>";
+		txt += chat.message;
+		div.html(txt);
+		$("#chat-history").prepend(div);	
+	}
 }
 
 
