@@ -1,12 +1,8 @@
 //global variables
-var players = [
-	{
-		chatHistory : [{anon:"first Chat"}]
-	}
-	];
 var database;
 var myPlayer;
 var opponent;
+var chatLog;
 var iWon;
 
 // settings
@@ -21,20 +17,34 @@ function initGame(){
 		messagingSenderId: "222650091540"
 	};
   	firebase.initializeApp(config);
-
 	// get a reference to the database
 	database = firebase.database();
 	
-	// **** Event Listeners *****
+// **** Event Listeners *****
 
 	// update local data when database changes
 	database.ref("players").on("value", function(snapshot){
-		players = snapshot.val();
-		displayGame();
+		//opponent = snapshot.child().val();
+		//displayOpponent();
 	}, function(error){
-		console.error(error);
+		console.error("Can't get opponent data: " + error);
+	});
+	/*
+	database.ref("players").on("value", function(snapshot){
+		//myPlayer = snapshot.val();
+		//displayMyPlayer();
+		console.log("players updated in DB");
+	}, function(error){
+		console.error("Can't get myPlayer data: " + error);
+	});
+	*/
+	database.ref("chatLog").on("value", function(snapshot){
+		displayChats(snapshot.val());
+	}, function(error){
+		console.error("Can't get chatLog data: " + error);
 	});
 
+	// click events
 	$("button.play").click(function(){
 		makeMove($(this).data("move"), myPlayer);
 	});
@@ -69,61 +79,56 @@ function initGame(){
 	newGame();
 }
 function createPlayer(newName){
-	if (players.length <= 3){
-		// don't add a new player if there are already 2
-		// claim next available player ID:
-		myPlayer = players.length;
-		// opponent gets the other value (either 1 or 2)
-		opponent = 3 - myPlayer;
-
-		players.push({
+	var numberOfPlayers = 1;
+	var ref = firebase.database().ref("players");
+	ref.once("value")
+	.then(function(snapshot) {
+		numberOfPlayers = snapshot.numChildren();
+		myPlayer = {
 			name : newName,
+			id : numberOfPlayers,
 			wins : 0,
 			losses : 0,
 			currentMove : false,
 			ready : true
-		});
-
-		saveGameToDB();
-	}
+		};
+		database.ref("players").push(myPlayer);
+	});
 }
 function sendChat(msg){
 	// default values
 	var chatter = "anon";
 	var chatOwner = false;
-	if (players[myPlayer]){
-		chatter = players[myPlayer].name;
-		chatOwner = myPlayer;
+	if (myPlayer && myPlayer.name){
+		chatter = myPlayer.name;
+		chatOwner = myPlayer.id;
 	}
-	players[0].chatHistory.push({name:chatter, message:msg, owner:chatOwner});
-	saveGameToDB();
+	database.ref("chatLog").push({name:chatter, message:msg, owner:chatOwner});
 }
 function makeMove(move, playerID){
-	if (!players[playerID].currentMove && players.length === 3){
-		// prevent someone from making multiple moves in a game
+	if (myPlayer.currentMove && opponent){
+		// prevent someone from making multiple moves in a round
 		// you can't make a move unless both players are present
-		players[playerID].currentMove = move;
-		players[myPlayer].ready = false;
+		myPlayer.currentMove = move;
+		myPlayer.ready = false;
 		//hide buttons until next move
 		$("section#player1").find("div.buttons").hide();
 		saveGameToDB();
 	}
-	
 }
-function displayGame(){
-	//display current player
+function displayMyPlayer(){
 	if(myPlayer){
 		// show name and score, if it exists
 		var section = $("#player1");
-		section.find(".name").text(players[myPlayer].name);
-		var scoreText = "Wins: " + players[myPlayer].wins + ", Losses: " + players[myPlayer].losses;
+		section.find(".name").text(myPlayer.name);
+		var scoreText = "Wins: " + myPlayer.wins + ", Losses: " + myPlayer.losses;
 		section.find(".score").text(scoreText);
 
 		// show image for move, if it exists
-		if (players[myPlayer].currentMove){
+		if (myPlayer.currentMove){
 			var handImage = $("<img>");
 			handImage
-				.attr("src", "assets/images/" + players[myPlayer].currentMove + ".png")
+				.attr("src", "assets/images/" + myPlayer.currentMove + ".png")
 				.addClass("hand-image");
 			section.find(".move").html(handImage);
 		} else {
@@ -131,50 +136,48 @@ function displayGame(){
 			section.find(".move").html("");
 		}
 	}
-	//display opponent
-	if (players[opponent]){
+}
+function displayOpponent(){
+	if (opponent && myPlayer){
 		// show name, if it exists
 		section = $("#player2");
-		if (players[opponent].name){
-			section.find(".name").text(players[opponent].name);
+		if (opponent.name){
+			section.find(".name").text(opponent.name);
 		}
-		// show image for move, if it exists AND if I have already made my move
-		if (players[opponent].currentMove && players[myPlayer].currentMove){
-				var handImage = $("<img>");
-				handImage
-					.attr("src", "assets/images/" + players[opponent].currentMove + ".png")
-					.addClass("hand-image");
-				section.find(".move").html(handImage);
-		} else {
-			// remove last image for move
-			section.find(".move").html("");
-		}
-		//check if both moves have been taken
-		if (players[opponent].currentMove && players[myPlayer].currentMove){
-			var winner = testMoves(players[opponent].currentMove, players[myPlayer].currentMove);
-			displayWinner(winner);
-		}
-	}
-	//display buttons if both players are present and ready
-	if(players[opponent] && players[myPlayer]){
-		if (players[opponent].ready && players[myPlayer].ready){
+		// show move buttons if both players are ready
+		if (opponent.ready && myPlayer.ready){
 			$("#player1 .buttons").show();
 			$("#result #display").empty();
 			$("#result").hide();
 		}
-	}
+		// show image for move, if it exists AND if I have already made my move
+		if (opponent.currentMove && myPlayer.currentMove){
+			var handImage = $("<img>");
+			handImage
+				.attr("src", "assets/images/" + opponent.currentMove + ".png")
+				.addClass("hand-image");
+			section.find(".move").html(handImage);
 
-	//display Chat
-	$("#chat-history").empty();
-	for(var i = 1; i < players[0].chatHistory.length; i++){
-		var div = $("<div>").addClass("chat-message");
-		if (players[0].chatHistory[i].owner){
-			div.addClass("chat-message-" + players[0].chatHistory[i].owner)
+			var winner = testMoves(opponent.currentMove, myPlayer.currentMove);
+			displayWinner(winner);
+		} else {
+			// remove last image for move
+			section.find(".move").html("");
 		}
-		var txt = '<span class="chatter">' + players[0].chatHistory[i].name + ": </span>";
-		txt += players[0].chatHistory[i].message;
+	}
+}
+function displayChats(snapshot){
+	$("#chat-history").empty();
+	for (var key in snapshot) {
+		var chat = snapshot[key];
+		var div = $("<div>").addClass("chat-message");
+		if (chat.owner){
+			div.addClass("chat-message-" + chat.owner)
+		}
+		var txt = '<span class="chatter">' + chat.name + ": </span>";
+		txt += chat.message;
 		div.html(txt);
-		$("#chat-history").prepend(div);
+		$("#chat-history").prepend(div);	
 	}
 }
 function testMoves(myMove, theirMove){
@@ -209,9 +212,9 @@ function displayWinner(didIwin){
 	} else {
 		var winner;
 		if (didIwin){
-			winner = players[myPlayer].name;
+			winner = myPlayer.name;
 		} else {
-			winner = players[opponent].name;
+			winner = opponent.name;
 		}
 		$("#result #display").text(winner + " wins!");
 	}
@@ -222,15 +225,16 @@ function displayWinner(didIwin){
 	$("#result").show().find("#display").append(newGameButton);
 }
 function checkForNewGame(){
-	players[myPlayer].currentMove = false;
-	players[myPlayer].ready = true;
+	// get my player ready for next round and wait for other player
+	myPlayer.currentMove = false;
+	myPlayer.ready = true;
 	if (iWon === true){
-		players[myPlayer].wins++;
+		myPlayer.wins++;
 	} else if (iWon === false){
-		players[myPlayer].losses++;
+		myPlayer.losses++;
 	}
 	saveGameToDB();
-	if(players[opponent].ready){
+	if(opponent.ready){
 		newGame();
 	} else {
 		$("#result #display").text("waiting for all players...");
@@ -243,8 +247,9 @@ function newGame(){
 }
 function saveGameToDB(){
 	console.log("saved");
-	database.ref("players").set(players);
+	//database.ref("gameData").set(gameData);
 }
+
 
 
 $(document).ready(initGame);
