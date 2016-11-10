@@ -10,7 +10,7 @@ https://firebase.google.com/docs/database/web/read-and-write
 For homework, week 7, UCLA coding boot camp
 
 ## TODO: 
- * # of non-players watching (connected) using presence
+ * when someone is watching, show the game going live
  * when a player disconnects, notify and put game back into waiting for player 2 mode
  * (optional) let player choose hand color -  look at this: https://codepen.io/designerJordan/pen/qDEjr
  * (optional) integrate network with your SET game!

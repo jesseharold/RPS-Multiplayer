@@ -6,6 +6,7 @@ var opponent;
 var opponentKey = "";
 var chatLog;
 var iWon;
+var gameIsFull = false;
 
 // settings
 
@@ -30,6 +31,7 @@ function initGame(){
 			database.ref("players").once("value")
 			.then(function(playersSnapshot) {
 				var numberOfPlayers = playersSnapshot.numChildren();
+				$("#watchers .data").text(numberOfPlayers+1);
 				var newPlayer = createPlayer(numberOfPlayers);
 				newPlayer.timeJoined = Date.now();
 				var con = database.ref('players').push(newPlayer);
@@ -81,6 +83,12 @@ function initGame(){
 			opponent = snapshot.child(opponentKey).val();
 			displayOpponent();
 		}
+		if(opponent && opponent.name && myPlayer && myPlayer.name){
+			gameIsFull = true;
+		} else {
+			gameIsFull = false;
+		}
+		database.ref("gameFull").set(gameIsFull);
 
 	}, function(error){
 		console.error("Can't get opponent data: " + error);
@@ -93,6 +101,11 @@ function initGame(){
 		console.error("Can't get chatLog data: " + error);
 	});
 
+	// watch for game getting full
+	database.ref("gameFull").on("value", function(snapshot){
+		gameIsFull = snapshot.val();
+	});
+	
 	// click events
 	$("button.play").click(function(){
 		makeMove($(this).data("move"), myPlayer);
@@ -100,9 +113,13 @@ function initGame(){
 	$("#result").on("click", "#new-game-button", checkForNewGame);
 
 	$("button.set-name").click(function(){
-		myPlayer.name = ($(this).prev("input.player-name").val());
-		myPlayer.ready = true;
-		saveMyPlayerToDB();
+		if(!gameIsFull){
+			myPlayer.name = ($(this).prev("input.player-name").val());
+			myPlayer.ready = true;
+			saveMyPlayerToDB();
+		} else {
+			alert("Sorry, someone's already playing, try again later");
+		}
 	});
 
 	$("button#send-chat").click(function(){
@@ -187,7 +204,7 @@ function displayBoard(){
 	// show image for opponent's move, if it exists AND if I have already made my move
 	section = $("#player2");
 	//console.log(myPlayer.currentMove + ", " + opponent.currentMove);
-	if (opponent.currentMove && myPlayer.currentMove){
+	if (opponent && opponent.currentMove && myPlayer && myPlayer.currentMove){
 		var handImage = $("<img>");
 		handImage
 			.attr("src", "assets/images/" + opponent.currentMove + ".png")
