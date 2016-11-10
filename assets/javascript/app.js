@@ -184,7 +184,7 @@ function displayBoard(){
 
 	// show image for opponent's move, if it exists AND if I have already made my move
 	section = $("#player2");
-	console.log(myPlayer.currentMove + ", " + opponent.currentMove);
+	//console.log(myPlayer.currentMove + ", " + opponent.currentMove);
 	if (opponent.currentMove && myPlayer.currentMove){
 		var handImage = $("<img>");
 		handImage
@@ -202,7 +202,7 @@ function displayBoard(){
 }
 
 function makeMove(move){
-	console.log("making Move");
+	//console.log("making Move");
 	if (myPlayer && myPlayer.ready && opponent && opponent.name){
 		// prevent someone from making multiple moves in a round
 		// you can't make a move unless both players are present
@@ -214,7 +214,7 @@ function makeMove(move){
 	}
 }
 function testMoves(myMove, theirMove){
-	console.log("testMoves()");
+	//console.log("testMoves()");
 	// more concise way to see who wins
 	// moves in ascending value of power:
 	var moves = ["paper", "scissors", "rock"];
@@ -239,7 +239,7 @@ function testMoves(myMove, theirMove){
 	}
 }
 function displayWinner(didIwin){
-	console.log("displayWinner()");
+	//console.log("displayWinner()");
 	//set the global variable to save to DB
 	iWon = didIwin;
 	if (didIwin === "tie"){
