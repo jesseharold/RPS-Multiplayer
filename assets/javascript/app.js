@@ -76,11 +76,12 @@ function initGame(){
 					// exit the forEach once we have an opponent
 				}
 			});
-			/*
-				
-				
-			*/
+		} else if (opponentKey && opponent && opponent.name){
+			//console.log("detected an update to " + opponent.name);
+			opponent = snapshot.child(opponentKey).val();
+			displayOpponent();
 		}
+
 	}, function(error){
 		console.error("Can't get opponent data: " + error);
 	});
@@ -148,14 +149,7 @@ function displayMyPlayer(){
 		var scoreText = "Wins: " + myPlayer.wins + ", Losses: " + myPlayer.losses;
 		section.find(".score").text(scoreText);
 
-		// show move buttons if both players are ready
-		if (opponent.ready && myPlayer.ready){
-			$("#player1 .buttons").show();
-			$("#result #display").empty();
-			$("#result").hide();
-		}
-		
-		// show image for move, if it exists
+		// show image for my move, if it exists
 		if (myPlayer.currentMove){
 			var handImage = $("<img>");
 			handImage
@@ -165,42 +159,51 @@ function displayMyPlayer(){
 		} else {
 			// clear previous image of move
 			section.find(".move").html("");
-		}
+		}		
+		displayBoard();
 	}
 }
 function displayOpponent(){
-	console.log("displayOpponent: " + opponent.name);
+	//console.log("displayOpponent: " + opponent.name);
 	if (opponent && myPlayer){
 		// show name, if it exists
 		section = $("#player2");
 		if (opponent.name){
 			section.find(".name").text(opponent.name);
 		}
-		// show move buttons if both players are ready
-		if (opponent.ready && myPlayer.ready){
-			$("#player1 .buttons").show();
-			$("#result #display").empty();
-			$("#result").hide();
-		}
-		// show image for move, if it exists AND if I have already made my move
-		if (opponent.currentMove && myPlayer.currentMove){
-			var handImage = $("<img>");
-			handImage
-				.attr("src", "assets/images/" + opponent.currentMove + ".png")
-				.addClass("hand-image");
-			section.find(".move").html(handImage);
+	}
+	displayBoard();
+}
+function displayBoard(){
+	// show move buttons if both players are ready
+	if (opponent && myPlayer && opponent.ready && myPlayer.ready){
+		$("#player1 .buttons").show();
+		$("#result #display").empty();
+		$("#result").hide();
+	}
 
-			var winner = testMoves(opponent.currentMove, myPlayer.currentMove);
-			displayWinner(winner);
-		} else {
-			// remove last image for move
-			section.find(".move").html("");
-		}
+	// show image for opponent's move, if it exists AND if I have already made my move
+	section = $("#player2");
+	console.log(myPlayer.currentMove + ", " + opponent.currentMove);
+	if (opponent.currentMove && myPlayer.currentMove){
+		var handImage = $("<img>");
+		handImage
+			.attr("src", "assets/images/" + opponent.currentMove + ".png")
+			.addClass("hand-image");
+		section.find(".move").html(handImage);
+		
+		var winner = testMoves(opponent.currentMove, myPlayer.currentMove);
+		displayWinner(winner);
+
+	} else {
+		// remove last image for move
+		section.find(".move").html("");
 	}
 }
+
 function makeMove(move){
 	console.log("making Move");
-	if (myPlayer && myPlayer.ready && opponent && opponent.ready){
+	if (myPlayer && myPlayer.ready && opponent && opponent.name){
 		// prevent someone from making multiple moves in a round
 		// you can't make a move unless both players are present
 		myPlayer.currentMove = move;
@@ -211,6 +214,7 @@ function makeMove(move){
 	}
 }
 function testMoves(myMove, theirMove){
+	console.log("testMoves()");
 	// more concise way to see who wins
 	// moves in ascending value of power:
 	var moves = ["paper", "scissors", "rock"];
@@ -235,6 +239,7 @@ function testMoves(myMove, theirMove){
 	}
 }
 function displayWinner(didIwin){
+	console.log("displayWinner()");
 	//set the global variable to save to DB
 	iWon = didIwin;
 	if (didIwin === "tie"){
