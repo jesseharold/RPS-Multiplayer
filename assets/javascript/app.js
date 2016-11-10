@@ -1,6 +1,7 @@
 //global variables
 var database;
 var myPlayer;
+var myKey;
 var opponent;
 var chatLog;
 var iWon;
@@ -30,9 +31,10 @@ function initGame(){
 				var numberOfPlayers = playersSnapshot.numChildren();
 				var newPlayer = createPlayer(numberOfPlayers);
 				var con = database.ref('players').push(newPlayer);
-
 				// when I disconnect, remove this player
 				con.onDisconnect().remove();
+				// remember the key for my player
+				myKey = con.key;
 			});
 		}
 	});
@@ -45,6 +47,7 @@ function initGame(){
 		if(myPlayer){
 			snapshot.forEach(function(childSnapshot) {
 				if(childSnapshot.val().id === myPlayer.id){
+					pathToMyPlayer = childSnapshot.fullPath;
 					myPlayer = childSnapshot.val();
 					displayMyPlayer();
 				} else {
@@ -56,7 +59,7 @@ function initGame(){
 	}, function(error){
 		console.error("Can't get opponent data: " + error);
 	});
-	database.ref("chatLog").on("value", function(snapshot){
+	database.ref("chatLog").orderByChild("timestamp").on("value", function(snapshot){
 		displayChats(snapshot.val());
 	}, function(error){
 		console.error("Can't get chatLog data: " + error);
@@ -69,7 +72,8 @@ function initGame(){
 	$("#result").on("click", "#new-game-button", checkForNewGame);
 
 	$("button.set-name").click(function(){
-		createPlayer($(this).prev("input.player-name").val());
+		myPlayer.name = ($(this).prev("input.player-name").val());
+		saveMyPlayerToDB();
 	});
 
 	$("button#send-chat").click(function(){
@@ -98,7 +102,7 @@ function initGame(){
 }
 function createPlayer(playerId){
 	myPlayer = {
-		name : "player "+playerId,
+		name : "",
 		id : playerId,
 		wins : 0,
 		losses : 0,
@@ -108,7 +112,7 @@ function createPlayer(playerId){
 	return myPlayer;
 }
 function displayMyPlayer(){
-	if(myPlayer){
+	if(myPlayer && myPlayer.name){
 		// show name and score, if it exists
 		var section = $("#player1");
 		section.find(".name").text(myPlayer.name);
@@ -235,8 +239,8 @@ function newGame(){
 }
 function saveMyPlayerToDB(){
 	if(myPlayer){
-		var ref = firebase.database().ref("players");
-		ref.orderByChild("id").equalTo(myPlayer.id).set(myPlayer);
+		console.log("saving "+myKey)
+		var ref = database.ref("players/"+myKey).set(myPlayer);
 	}
 }
 function sendChat(msg){
@@ -245,9 +249,10 @@ function sendChat(msg){
 	var chatOwner = false;
 	if (myPlayer && myPlayer.name){
 		chatter = myPlayer.name;
-		chatOwner = myPlayer.id;
+		chatOwner = "user-" + myPlayer.id;
 	}
-	database.ref("chatLog").push({name:chatter, message:msg, owner:chatOwner});
+	var timeStamp = new Date();
+	database.ref("chatLog").push({name:chatter, message:msg, owner:chatOwner, timestamp:timeStamp});
 }
 function displayChats(snapshot){
 	$("#chat-history").empty();

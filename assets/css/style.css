@@ -60,10 +60,10 @@ h2 {
 .chatter{
     font-style: italic;
 }
-.chat-message-1{
+.chat-message-user-0{
     background-color: aliceblue;
 }
-.chat-message-2{
+.chat-message-user-1{
     background-color: bisque;
 }
 .buttons {
