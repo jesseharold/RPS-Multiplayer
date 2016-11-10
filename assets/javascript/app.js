@@ -1,8 +1,9 @@
 //global variables
 var database;
 var myPlayer;
-var myKey;
+var myKey = "";
 var opponent;
+var opponentKey = "";
 var chatLog;
 var iWon;
 
@@ -30,6 +31,7 @@ function initGame(){
 			.then(function(playersSnapshot) {
 				var numberOfPlayers = playersSnapshot.numChildren();
 				var newPlayer = createPlayer(numberOfPlayers);
+				newPlayer.timeJoined = Date.now();
 				var con = database.ref('players').push(newPlayer);
 				// when I disconnect, remove this player
 				con.onDisconnect().remove();
@@ -43,22 +45,34 @@ function initGame(){
 // **** Event Listeners *****
 
 	// update local data when database changes
-	database.ref("players").orderByChild("id").on("value", function(snapshot){
-		if(myPlayer){
-			snapshot.forEach(function(childSnapshot) {
-				if(childSnapshot.val().id === myPlayer.id){
-					pathToMyPlayer = childSnapshot.fullPath;
-					myPlayer = childSnapshot.val();
-					displayMyPlayer();
-				} else {
-					opponent = childSnapshot.val();
-					displayOpponent();
-				}
-			});
+	
+	// watch for updates to myPlayer
+	database.ref("players/"+myKey).on("value", function(snapshot){
+		if (myKey){
+			myPlayer = snapshot.child(myKey).val();
+			displayMyPlayer();
+		}
+	}, function(error){
+		console.error("Can't get player data: " + error);
+	});
+
+	// watch for updates to other players
+	database.ref("players").on("child_added", function(snapshot){
+		if (myKey){
+			// only add opponent if we already have a player
+			// if opponent already doesn't exist and there's another player, create opponent
+			if(!opponent){
+				console.log("adding opponent");
+				opponent = snapshot.val();
+				opponentKey = snapshot.key;				
+				displayOpponent();
+			} 
 		}
 	}, function(error){
 		console.error("Can't get opponent data: " + error);
 	});
+
+	// watch for new chats
 	database.ref("chatLog").orderByChild("timestamp").on("value", function(snapshot){
 		displayChats(snapshot.val());
 	}, function(error){
@@ -112,6 +126,7 @@ function createPlayer(playerId){
 	return myPlayer;
 }
 function displayMyPlayer(){
+	console.log("displayMyPlayer: " + myPlayer.name);
 	if(myPlayer && myPlayer.name){
 		// show name and score, if it exists
 		var section = $("#player1");
@@ -133,6 +148,7 @@ function displayMyPlayer(){
 	}
 }
 function displayOpponent(){
+	console.log("displayOpponent: " + opponent.name);
 	if (opponent && myPlayer){
 		// show name, if it exists
 		section = $("#player2");
@@ -235,11 +251,9 @@ function checkForNewGame(){
 function newGame(){
 	$("#result #display").empty();
 	$("#result").hide();
-	saveMyPlayerToDB();
 }
 function saveMyPlayerToDB(){
 	if(myPlayer){
-		console.log("saving "+myKey)
 		var ref = database.ref("players/"+myKey).set(myPlayer);
 	}
 }
