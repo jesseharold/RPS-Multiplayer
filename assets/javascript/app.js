@@ -109,6 +109,8 @@ function initGame(){
 		sendChat($(this).prev("input").val().trim());
 		$(this).prev("input").val("");
 	});
+	
+	$("button#clear-chat").click(clearChat);
 
 	//empty name input when you click on it
 	$("input").on("focus", function(){
@@ -268,6 +270,7 @@ function checkForNewGame(){
 	} else if (iWon === false){
 		myPlayer.losses++;
 	}
+	displayMyPlayer();
 	saveMyPlayerToDB();
 	if(opponent.ready){
 		newGame();
@@ -308,6 +311,9 @@ function displayChats(snapshot){
 		div.html(txt);
 		$("#chat-history").prepend(div);	
 	}
+}
+function clearChat(){
+	database.ref("chatLog").remove();
 }
 
 
