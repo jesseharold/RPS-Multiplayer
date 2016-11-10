@@ -52,7 +52,9 @@ function initGame(){
 	database.ref("players/"+myKey).on("value", function(snapshot){
 		if (myKey){
 			myPlayer = snapshot.child(myKey).val();
-			displayMyPlayer();
+			if (myPlayer.name){
+				displayMyPlayer();
+			}
 		}
 	}, function(error){
 		console.error("Can't get player data: " + error);
@@ -63,14 +65,15 @@ function initGame(){
 		if (myKey && !opponent && snapshot.numChildren() > 1){
 			// only add opponent if we already have a player
 			// if opponent already doesn't exist 
-			// and there's another person connected
+			// and there's another person connected who has entered their name
 			snapshot.forEach(function(childSnapshot) {
-				if(childSnapshot.val().key !== myKey){
+				if(childSnapshot.key !== myKey && childSnapshot.val().name){
 					//console.log("adding opponent" + childSnapshot.val().name);
 					opponent = childSnapshot.val();
 					opponentKey = childSnapshot.key;				
 					displayOpponent();
 					return true;
+					// exit the forEach once we have an opponent
 				}
 			});
 			/*
@@ -97,6 +100,7 @@ function initGame(){
 
 	$("button.set-name").click(function(){
 		myPlayer.name = ($(this).prev("input.player-name").val());
+		myPlayer.ready = true;
 		saveMyPlayerToDB();
 	});
 
@@ -131,7 +135,7 @@ function createPlayer(playerId){
 		wins : 0,
 		losses : 0,
 		currentMove : false,
-		ready : true
+		ready : false
 	};
 	return myPlayer;
 }
@@ -144,6 +148,13 @@ function displayMyPlayer(){
 		var scoreText = "Wins: " + myPlayer.wins + ", Losses: " + myPlayer.losses;
 		section.find(".score").text(scoreText);
 
+		// show move buttons if both players are ready
+		if (opponent.ready && myPlayer.ready){
+			$("#player1 .buttons").show();
+			$("#result #display").empty();
+			$("#result").hide();
+		}
+		
 		// show image for move, if it exists
 		if (myPlayer.currentMove){
 			var handImage = $("<img>");
@@ -158,7 +169,7 @@ function displayMyPlayer(){
 	}
 }
 function displayOpponent(){
-	//console.log("displayOpponent: " + opponent.name);
+	console.log("displayOpponent: " + opponent.name);
 	if (opponent && myPlayer){
 		// show name, if it exists
 		section = $("#player2");
@@ -187,8 +198,9 @@ function displayOpponent(){
 		}
 	}
 }
-function makeMove(move, playerID){
-	if (myPlayer.currentMove && opponent){
+function makeMove(move){
+	console.log("making Move");
+	if (myPlayer && myPlayer.ready && opponent && opponent.ready){
 		// prevent someone from making multiple moves in a round
 		// you can't make a move unless both players are present
 		myPlayer.currentMove = move;
