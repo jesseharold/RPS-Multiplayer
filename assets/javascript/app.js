@@ -19,6 +19,24 @@ function initGame(){
   	firebase.initializeApp(config);
 	// get a reference to the database
 	database = firebase.database();
+
+// Manage presence
+	var connectedRef = database.ref('.info/connected');
+	connectedRef.on('value', function(snapshot) {
+		if (snapshot.val() === true) {
+			// add this player to my connections list
+			database.ref("players").once("value")
+			.then(function(playersSnapshot) {
+				var numberOfPlayers = playersSnapshot.numChildren();
+				var newPlayer = createPlayer(numberOfPlayers);
+				var con = database.ref('players').push(newPlayer);
+
+				// when I disconnect, remove this player
+				con.onDisconnect().remove();
+			});
+		}
+	});
+
 	
 // **** Event Listeners *****
 
@@ -27,8 +45,10 @@ function initGame(){
 		if(myPlayer){
 			snapshot.forEach(function(childSnapshot) {
 				if(childSnapshot.val().id === myPlayer.id){
+					myPlayer = childSnapshot.val();
 					displayMyPlayer();
 				} else {
+					opponent = childSnapshot.val();
 					displayOpponent();
 				}
 			});
@@ -76,22 +96,16 @@ function initGame(){
 
 	newGame();
 }
-function createPlayer(newName){
-	var numberOfPlayers = 1;
-	var ref = firebase.database().ref("players");
-	ref.once("value")
-	.then(function(snapshot) {
-		numberOfPlayers = snapshot.numChildren();
-		myPlayer = {
-			name : newName,
-			id : numberOfPlayers,
-			wins : 0,
-			losses : 0,
-			currentMove : false,
-			ready : true
-		};
-		database.ref("players").push(myPlayer);
-	});
+function createPlayer(playerId){
+	myPlayer = {
+		name : "player "+playerId,
+		id : playerId,
+		wins : 0,
+		losses : 0,
+		currentMove : false,
+		ready : true
+	};
+	return myPlayer;
 }
 function displayMyPlayer(){
 	if(myPlayer){
