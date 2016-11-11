@@ -81,7 +81,6 @@ function initGame(){
 			//console.log("detected an update to " + opponent.name);
 			opponent = snapshot.child(opponentKey).val();
 			displayOpponent();
-			testGame();
 		}
 		if(opponent && opponent.name && myPlayer && myPlayer.name){
 			gameIsFull = true;
@@ -89,6 +88,7 @@ function initGame(){
 			gameIsFull = false;
 		}
 		database.ref("gameFull").set(gameIsFull);
+		testGame();
 
 	}, function(error){
 		console.error("Can't get opponent data: " + error);
@@ -105,6 +105,7 @@ function initGame(){
 	database.ref("gameFull").on("value", function(snapshot){
 		gameIsFull = snapshot.val();
 	});
+
 	
 	// click events
 	$("button.play").click(function(){
@@ -215,6 +216,7 @@ function displayBoard(){
 		$("#result #display").empty();
 		$("#result").hide();
 	}
+	testGame();
 }
 
 function makeMove(move){
@@ -225,7 +227,6 @@ function makeMove(move){
 		myPlayer.currentMove = move;
 		myPlayer.ready = false;
 		//hide buttons until next move
-		testGame();
 		$("section#player1").find("div.buttons").hide();
 		saveMyPlayerToDB();
 	}
@@ -233,13 +234,15 @@ function makeMove(move){
 function testGame(){
 	//if all moves have been made, see who won and update score
 	if (myPlayer && myPlayer.currentMove && opponent && opponent.currentMove){
-	//console.log("all moves are in");
-		var winner = testMoves(opponent.currentMove, myPlayer.currentMove);
-		if (winner === true){
-			myPlayer.wins++;
-		} else if (winner === false){
-			myPlayer.losses++;
-		}
+		//if(!scoreUpdated){
+			//scoreUpdated = true;
+			var winner = testMoves(opponent.currentMove, myPlayer.currentMove);
+			if (winner === true){
+				myPlayer.wins++;
+			} else if (winner === false){
+				myPlayer.losses++;
+			}
+		//}
 		displayWinner(winner);
 	}
 }
@@ -269,7 +272,7 @@ function testMoves(myMove, theirMove){
 	}
 }
 function displayWinner(didIwin){
-console.log("displayWinner()");
+	//console.log("displayWinner() " + didIwin);
 	if (didIwin === "tie"){
 		$("#result #display").text("Tie!");
 	} else {
@@ -301,6 +304,7 @@ function checkForNewGame(){
 function newGame(){
 	$("#result #display").empty();
 	$("#result").hide();
+	scoreUpdated = false;
 }
 function saveMyPlayerToDB(){
 	if(myPlayer){
