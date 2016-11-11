@@ -5,7 +5,6 @@ var myKey = "";
 var opponent;
 var opponentKey = "";
 var chatLog;
-var iWon;
 var gameIsFull = false;
 
 // settings
@@ -65,8 +64,8 @@ function initGame(){
 	// watch for updates to other players
 	database.ref("players").orderByChild("timeJoined").on("value", function(snapshot){
 		if (myKey && !opponent && snapshot.numChildren() > 1){
-			// only add opponent if we already have a player
-			// if opponent already doesn't exist 
+			// add opponent if we already have a player
+			// AND opponent already doesn't exist 
 			// and there's another person connected who has entered their name
 			snapshot.forEach(function(childSnapshot) {
 				if(childSnapshot.key !== myKey && childSnapshot.val().name){
@@ -82,6 +81,7 @@ function initGame(){
 			//console.log("detected an update to " + opponent.name);
 			opponent = snapshot.child(opponentKey).val();
 			displayOpponent();
+			testGame();
 		}
 		if(opponent && opponent.name && myPlayer && myPlayer.name){
 			gameIsFull = true;
@@ -190,6 +190,21 @@ function displayOpponent(){
 		if (opponent.name){
 			section.find(".name").text(opponent.name);
 		}
+
+		
+		// show image for opponent's move, if it exists AND if I have already made my move
+		section = $("#player2");
+		if (opponent.currentMove && myPlayer.currentMove){
+		//console.log(myPlayer.currentMove + ", " + opponent.currentMove);
+			var handImage = $("<img>");
+			handImage
+				.attr("src", "assets/images/" + opponent.currentMove + ".png")
+				.addClass("hand-image");
+			section.find(".move").html(handImage);
+		} else {
+			// remove last image for move
+			section.find(".move").html("");
+		}
 	}
 	displayBoard();
 }
@@ -199,24 +214,6 @@ function displayBoard(){
 		$("#player1 .buttons").show();
 		$("#result #display").empty();
 		$("#result").hide();
-	}
-
-	// show image for opponent's move, if it exists AND if I have already made my move
-	section = $("#player2");
-	//console.log(myPlayer.currentMove + ", " + opponent.currentMove);
-	if (opponent && opponent.currentMove && myPlayer && myPlayer.currentMove){
-		var handImage = $("<img>");
-		handImage
-			.attr("src", "assets/images/" + opponent.currentMove + ".png")
-			.addClass("hand-image");
-		section.find(".move").html(handImage);
-		
-		var winner = testMoves(opponent.currentMove, myPlayer.currentMove);
-		displayWinner(winner);
-
-	} else {
-		// remove last image for move
-		section.find(".move").html("");
 	}
 }
 
@@ -228,8 +225,22 @@ function makeMove(move){
 		myPlayer.currentMove = move;
 		myPlayer.ready = false;
 		//hide buttons until next move
+		testGame();
 		$("section#player1").find("div.buttons").hide();
 		saveMyPlayerToDB();
+	}
+}
+function testGame(){
+	//if all moves have been made, see who won and update score
+	if (myPlayer && myPlayer.currentMove && opponent && opponent.currentMove){
+	//console.log("all moves are in");
+		var winner = testMoves(opponent.currentMove, myPlayer.currentMove);
+		if (winner === true){
+			myPlayer.wins++;
+		} else if (winner === false){
+			myPlayer.losses++;
+		}
+		displayWinner(winner);
 	}
 }
 function testMoves(myMove, theirMove){
@@ -258,9 +269,7 @@ function testMoves(myMove, theirMove){
 	}
 }
 function displayWinner(didIwin){
-	//console.log("displayWinner()");
-	//set the global variable to save to DB
-	iWon = didIwin;
+console.log("displayWinner()");
 	if (didIwin === "tie"){
 		$("#result #display").text("Tie!");
 	} else {
@@ -282,12 +291,6 @@ function checkForNewGame(){
 	// get my player ready for next round and wait for other player
 	myPlayer.currentMove = false;
 	myPlayer.ready = true;
-	if (iWon === true){
-		myPlayer.wins++;
-	} else if (iWon === false){
-		myPlayer.losses++;
-	}
-	displayMyPlayer();
 	saveMyPlayerToDB();
 	if(opponent.ready){
 		newGame();
