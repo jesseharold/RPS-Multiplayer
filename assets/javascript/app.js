@@ -30,7 +30,6 @@ function initGame(){
 			database.ref("players").once("value")
 			.then(function(playersSnapshot) {
 				var numberOfPlayers = playersSnapshot.numChildren();
-				$("#watchers .data").text(numberOfPlayers+1);
 				var newPlayer = createPlayer(numberOfPlayers);
 				newPlayer.timeJoined = Date.now();
 				var con = database.ref('players').push(newPlayer);
@@ -63,6 +62,7 @@ function initGame(){
 
 	// watch for updates to other players
 	database.ref("players").orderByChild("timeJoined").on("value", function(snapshot){
+		$("#watchers .data").text(snapshot.numChildren());
 		if (myKey && !opponent && snapshot.numChildren() > 1){
 			// add opponent if we already have a player
 			// AND opponent already doesn't exist 

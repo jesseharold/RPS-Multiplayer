@@ -13,8 +13,6 @@ For homework, week 7, UCLA coding boot camp
 
 ## TODO: 
  * update score on win, not on new game
- * watchers not updating when a new person connects, only on refresh
- * opponent not showing when waiting for you
  * 2 different chat classes not working
  * when a player disconnects, notify and put game back into waiting for player 2 mode
 
