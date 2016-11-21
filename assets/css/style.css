@@ -60,16 +60,16 @@ h2 {
     height: 160px;
     margin: -10px 0 0 10px;
 }
-.chat-message{
+.chat-message {
     margin: 3px 0;
 }
-.chatter{
+.chatter {
     font-style: italic;
 }
-.chat-message-user-0{
+.chat-message-self {
     background-color: aliceblue;
 }
-.chat-message-user-1{
+.chat-message-opponent {
     background-color: bisque;
 }
 .buttons {

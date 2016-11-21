@@ -5,7 +5,7 @@ var myKey = "";
 var opponent;
 var opponentKey = "";
 var chatLog;
-var gameIsFull = false;
+var role = "watcher";
 
 // settings
 
@@ -54,6 +54,7 @@ function initGame(){
 		if (myKey){
 			myPlayer = snapshot.child(myKey).val();
 			if (myPlayer.name){
+				role = "player";
 				displayMyPlayer();
 			}
 		}
@@ -318,7 +319,7 @@ function sendChat(msg){
 	var chatOwner = false;
 	if (myPlayer && myPlayer.name){
 		chatter = myPlayer.name;
-		chatOwner = "user-" + myPlayer.id;
+		chatOwner = myKey;
 	}
 	var timeStamp = new Date();
 	database.ref("chatLog").push({name:chatter, message:msg, owner:chatOwner, timestamp:timeStamp});
@@ -328,9 +329,11 @@ function displayChats(snapshot){
 	for (var key in snapshot) {
 		var chat = snapshot[key];
 		var div = $("<div>").addClass("chat-message");
-		if (chat.owner){
-			div.addClass("chat-message-" + chat.owner)
-		}
+		if (chat.owner === myKey){
+			div.addClass("chat-message-self");
+		} else if (chat.owner === opponentKey){
+			div.addClass("chat-message-opponent");
+		} 
 		var txt = '<span class="chatter">' + chat.name + ": </span>";
 		txt += chat.message;
 		div.html(txt);
