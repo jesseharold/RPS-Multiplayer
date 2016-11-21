@@ -12,13 +12,14 @@ var gameIsFull = false;
 function initGame(){
 	// Initialize Firebase
 	var config = {
-		apiKey: "AIzaSyDpkXfloYmdVW9IyEoyfTrAE07OmBKNf8U",
-		authDomain: "testing-3cc34.firebaseapp.com",
-		databaseURL: "https://testing-3cc34.firebaseio.com",
-		storageBucket: "testing-3cc34.appspot.com",
-		messagingSenderId: "222650091540"
+		apiKey: "AIzaSyDhjIqd5KuZxaKuA0aPx91P2ihd88bBOMw",
+		authDomain: "rock-paper-scissors2.firebaseapp.com",
+		databaseURL: "https://rock-paper-scissors2.firebaseio.com",
+		storageBucket: "rock-paper-scissors2.appspot.com",
+		messagingSenderId: "249441131797"
 	};
-  	firebase.initializeApp(config);
+	firebase.initializeApp(config);
+
 	// get a reference to the database
 	database = firebase.database();
 
