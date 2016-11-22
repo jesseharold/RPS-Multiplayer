@@ -13,8 +13,9 @@ For homework, week 7, UCLA coding boot camp
 
 ## TODO: 
  * update score on win, not on new game
- * 2 different chat classes not working
- * when a player disconnects, notify and put game back into waiting for player 2 mode
+ * fix scoring issue, one player is getting double score, one not getting score
+ * when a player disconnects, remove from players DB
+ * if opponent disconnects, put game back into waiting for player 2 mode and check for watchers
 
 ## Planned for the future
  * when someone is watching, show the game going live

@@ -34,12 +34,12 @@ function initGame(){
 			.then(function(presentSnapshot) {
 				myPlayer = createPlayer();
 				var con = database.ref("present").push(myPlayer);
+				myKey = con.key;
+				myPlayer.id = myKey;
 				$("#watchers .data").text(presentSnapshot.numChildren() + 1);
 				// when I disconnect, remove this player
 				con.onDisconnect().remove();
-
 				// remember the key for my player
-				myKey = con.key;
 			});
 		}
 	});
@@ -47,18 +47,19 @@ function initGame(){
 	
 // **** Event Listeners *****
 
-	// update local data when database changes
+	// watch for disconnections
 	database.ref("present").on("child_removed", function(snapshot) {
-		// check to see if your opponent is still connected
-		// if not, check for a watcher to add to the game
-		console.log("player disconnected");
-		//remove that player from the players db
+		//console.log("player disconnected");
+		if (snapshot.key === opponentKey){
+			// Your opponent left the game
+			removePlayer(opponentKey);
+		}
 	});
 
 	// watch for updates to players
 	database.ref("players").on("value", function(snapshot){
 		var numPlayers =snapshot.numChildren();
-		console.log("There are now " + numPlayers + " players.");
+		//console.log("There are now " + numPlayers + " players.");
 		localCopyPlayers = snapshot.val();
 		if (numPlayers === 1){
 			// waiting for a second player
@@ -68,33 +69,36 @@ function initGame(){
 				for (var key in localCopyPlayers){
 					if(localCopyPlayers[key].name){
 						opponent = localCopyPlayers[key];
-						console.log(opponent);
 						displayPlayer2isWaiting();
 					}
 				}
 			} else {
+				//check to see if opponent is gone
 				// you are waiting for second player
 				displayWaitingforPlayer2();
 			}
 		}  else if (numPlayers >= 2){
 			// ready to play game
 			gameIsFull = true;
-			localCopyPlayers = snapshot.val();
-			for (var key in localCopyPlayers){
-				console.log(localCopyPlayers[key].id);
-				console.log("myKey: "+myKey);
-				if (localCopyPlayers[key].id === myKey){
-					//set local myPlayer todb copy
-					myPlayer = localCopyPlayers[key];
-				} else {
-					//set local opponent to other player in db
-					opponent = localCopyPlayers[key];
+			if(myPlayer.name){
+				localCopyPlayers = snapshot.val();
+				for (var key in localCopyPlayers){
+					if (localCopyPlayers[key].id === myKey){
+						//set local myPlayer to db copy
+						myPlayer = localCopyPlayers[key];
+					} else {
+						//set local opponent to other player in db
+						opponent = localCopyPlayers[key];
+						opponentKey = key;
+					}
 				}
+				displayOpponent();
+				displayMyPlayer();
+			} else {
+				//no name means you're a watcher
+				displayFullGame();
 			}
-			displayOpponent();
-			displayMyPlayer();
 		}
-		//testGame();
 	}, function(error){
 		console.error("Can't get opponent data: " + error);
 	});
@@ -154,6 +158,19 @@ function createPlayer(){
 	};
 	return newPlayer;
 }
+function removePlayer(removeId){
+	// find member of players with id that matches the argument
+	// and delete it
+	database.ref("players").once("value")
+		.then(function(snapshot) {
+			var players = snapshot.val();
+			for (var playerKey in players){
+				if (players[playerKey].id === removeId){
+					database.ref("players/" + playerKey).remove();
+				}
+			}
+		});
+}
 function joinGame(){
 	if(!gameIsFull){
 		myPlayer.name = $("#player1").find("input.player-name").val();
@@ -192,6 +209,10 @@ function displayWaitingforPlayer2(){
 }
 function displayPlayer2isWaiting(){
 	$("#player2 .name").text(opponent.name + " is waiting for you to join.");
+}
+function displayFullGame(){
+	// need to work on this some more
+	$("#player1 .name").text("This game is full.");
 }
 function displayOpponent(){
 	//console.log("displayOpponent: " + opponent.name);
@@ -242,15 +263,12 @@ function makeMove(move){
 function testGame(){
 	//if all moves have been made, see who won and update score
 	if (myPlayer && myPlayer.currentMove && opponent && opponent.currentMove){
-		//if(!scoreUpdated){
-			//scoreUpdated = true;
-			var winner = testMoves(opponent.currentMove, myPlayer.currentMove);
-			if (winner === true){
-				myPlayer.wins++;
-			} else if (winner === false){
-				myPlayer.losses++;
-			}
-		//}
+		var winner = testMoves(myPlayer.currentMove, opponent.currentMove);
+		if (winner === true){
+			myPlayer.wins++;
+		} else if (winner === false){
+			myPlayer.losses++;
+		}
 		displayWinner(winner);
 	}
 }
@@ -316,7 +334,6 @@ function newGame(){
 }
 function saveMyPlayerToDB(){
 	if(myPlayer){
-		myPlayer.id = myKey;
 		var ref = database.ref("players/"+myKey).set(myPlayer);
 	}
 }
