@@ -5,6 +5,7 @@ var myKey = "";
 var opponent;
 var opponentKey = "";
 var chatLog;
+var gameIsFull = false;
 var role = false;
 var localCopyPlayers;
 
@@ -58,11 +59,21 @@ function initGame(){
 	database.ref("players").on("value", function(snapshot){
 		var numPlayers =snapshot.numChildren();
 		console.log("There are now " + numPlayers + " players.");
+		localCopyPlayers = snapshot.val();
 		if (numPlayers === 1){
+			// waiting for a second player
 			gameIsFull = false;
 			if (!myPlayer.ready){
-				displayPlayer2isWaiting();
+				// second player already waiting
+				for (var key in localCopyPlayers){
+					if(localCopyPlayers[key].name){
+						opponent = localCopyPlayers[key];
+						console.log(opponent);
+						displayPlayer2isWaiting();
+					}
+				}
 			} else {
+				// you are waiting for second player
 				displayWaitingforPlayer2();
 			}
 		}  else if (numPlayers >= 2){
@@ -139,7 +150,6 @@ function createPlayer(){
 		losses : 0,
 		currentMove : false,
 		ready : false,
-		role : "watcher",
 		timeJoined : Date.now()
 	};
 	return newPlayer;
@@ -177,8 +187,11 @@ function displayMyPlayer(){
 		displayBoard();
 	}
 }
-function displayWaiting(){
+function displayWaitingforPlayer2(){
 	$("#player2 .name").text("Waiting for Player 2 to join.");
+}
+function displayPlayer2isWaiting(){
+	$("#player2 .name").text(opponent.name + " is waiting for you to join.");
 }
 function displayOpponent(){
 	//console.log("displayOpponent: " + opponent.name);
