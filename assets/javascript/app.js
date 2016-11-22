@@ -25,7 +25,7 @@ function initGame(){
 
 // Manage presence
 	var connectedRef = database.ref('.info/connected');
-	connectedRef.on('value', function(snapshot) {
+	connectedRef.on('child_added', function(snapshot) {
 		if (snapshot.val() === true) {
 			// add this player to my connections list
 			database.ref("players").once("value")
@@ -62,9 +62,15 @@ function initGame(){
 		console.error("Can't get player data: " + error);
 	});
 
+	database.ref("players").on("child_removed", function(snapshot) {
+		//check to see if your opponent disconnected
+		//if so, check for a watcher to add to the game
+	});
+	
 	// watch for updates to other players
-	database.ref("players").orderByChild("timeJoined").on("value", function(snapshot){
+	database.ref("players").orderByChild("timeJoined").on("child_added", function(snapshot){
 		$("#watchers .data").text(snapshot.numChildren());
+		/*
 		if (myKey && !opponent && snapshot.numChildren() > 1){
 			// add opponent if we already have a player
 			// AND opponent already doesn't exist 
@@ -91,7 +97,7 @@ function initGame(){
 		}
 		database.ref("gameFull").set(gameIsFull);
 		testGame();
-
+		*/
 	}, function(error){
 		console.error("Can't get opponent data: " + error);
 	});
