@@ -11,13 +11,6 @@ var gameIsFull = false;
 
 function initGame(){
 	// Initialize Firebase
-	var config = {
-		apiKey: "AIzaSyDpkXfloYmdVW9IyEoyfTrAE07OmBKNf8U",
-		authDomain: "testing-3cc34.firebaseapp.com",
-		databaseURL: "https://testing-3cc34.firebaseio.com",
-		storageBucket: "testing-3cc34.appspot.com",
-		messagingSenderId: "222650091540"
-	};
   	firebase.initializeApp(config);
 	// get a reference to the database
 	database = firebase.database();
