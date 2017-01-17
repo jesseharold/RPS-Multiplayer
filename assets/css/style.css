@@ -117,8 +117,3 @@ button.play {
     filter: FlipH;
     -ms-filter: "FlipH";
 }
-
-/* responsive styles! */
-@media screen and (max-width: 750px) {
-   
-}
