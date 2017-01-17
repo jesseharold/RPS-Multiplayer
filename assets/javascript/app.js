@@ -51,7 +51,7 @@ function initGame(){
 		}
 	}, function(error){
 		console.error("Can't get player data: " + error);
-	});
+	});//
 
 	// watch for updates to other players
 	database.ref("players").orderByChild("timeJoined").on("value", function(snapshot){
@@ -75,23 +75,20 @@ function initGame(){
 			opponent = snapshot.child(opponentKey).val();
 			displayOpponent();
 		}
-		if(opponent && opponent.name && myPlayer && myPlayer.name){
-			gameIsFull = true;
-		} else {
-			gameIsFull = false;
-		}
+		
+		gameIsFull = opponent && opponent.name && myPlayer && myPlayer.name;
 		database.ref("gameFull").set(gameIsFull);
 		testGame();
 
 	}, function(error){
-		console.error("Can't get opponent data: " + error);
+		//console.error("Can't get opponent data: " + error);
 	});
 
 	// watch for new chats
 	database.ref("chatLog").orderByChild("timestamp").on("value", function(snapshot){
 		displayChats(snapshot.val());
 	}, function(error){
-		console.error("Can't get chatLog data: " + error);
+		//console.error("Can't get chatLog data: " + error);
 	});
 
 	// watch for game getting full
@@ -246,6 +243,7 @@ function testMoves(myMove, theirMove){
 	var moves = ["paper", "scissors", "rock"];
 	var mine = moves.indexOf(myMove);
 	var theirs = moves.indexOf(theirMove);
+	// assigns each move a value (0, 1 or 2)
 	// test the difference between the moves' values:
 	switch (mine - theirs){
 		case 0:
@@ -255,6 +253,7 @@ function testMoves(myMove, theirMove){
 			//if a move is one larger, it wins
 			return false;
 		case -1:
+			//if a move is one smaller, it loses
 			return true;
 		case 2:
 			// 2 means rock v paper, paper wins
